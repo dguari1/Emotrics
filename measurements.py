@@ -269,13 +269,20 @@ def get_measurements_from_data(shape, left_pupil, right_pupil):
     comm_exc_left, smile_angle_left, _ = mouth_measures(cross_lowerlip, shape[54], rot_angle)
     
     ResultsLeft.CommissureExcursion = comm_exc_left
-    ResultsLeft.SmileAngle = smile_angle_left
+    if cross_lowerlip[1] >= shape[54,1]:
+        ResultsLeft.SmileAngle = 90 + smile_angle_left
+    else:
+        ResultsLeft.SmileAngle = 90 + smile_angle_left    
     #ResultsLeft.CommissureHeight = comm_height_left
     
     comm_exc_right, smile_angle_right, _ = mouth_measures(cross_lowerlip, shape[48], rot_angle)
     
     ResultsRight.CommissureExcursion = comm_exc_right
-    ResultsRight.SmileAngle = smile_angle_right
+    
+    if cross_lowerlip[1] >= shape[48,1]:
+        ResultsRight.SmileAngle = 90 + smile_angle_right
+    else:
+        ResultsRight.SmileAngle = 90 + smile_angle_right
     #ResultsRight.CommissureHeight = comm_height_right
     
     ResultsDeviation.CommisureHeightDeviation = deviation(shape[48],shape[54],center,rot_angle)
@@ -424,14 +431,20 @@ def get_measurements_from_data(shape, left_pupil, right_pupil):
         ResultsPercentile.MarginalReflexDistance2 = abs(ResultsLeft.MarginalReflexDistance2 - ResultsRight.MarginalReflexDistance2)*100/ResultsLeft.MarginalReflexDistance2
         ResultsPercentile.CommissureExcursion = abs(ResultsLeft.CommissureExcursion - ResultsRight.CommissureExcursion)*100/ResultsLeft.CommissureExcursion
         ResultsPercentile.SmileAngle = (ResultsLeft.SmileAngle - ResultsRight.SmileAngle)*100/ResultsLeft.SmileAngle
-        ResultsPercentile.DentalShow = (ResultsLeft.DentalShow - ResultsRight.DentalShow)*100/ResultsLeft.DentalShow   
+        if ResultsLeft.DentalShow >0:
+            ResultsPercentile.DentalShow = (ResultsLeft.DentalShow - ResultsRight.DentalShow)*100/ResultsLeft.DentalShow   
+        else:
+            ResultsPercentile.DentalShow = 0
     else:  #right is the good side 
         ResultsPercentile.BrowHeight = abs(ResultsLeft.BrowHeight - ResultsRight.BrowHeight)*100/ResultsRight.BrowHeight
         ResultsPercentile.MarginalReflexDistance1 = abs(ResultsLeft.MarginalReflexDistance1 - ResultsRight.MarginalReflexDistance1)*100/ResultsRight.MarginalReflexDistance1
         ResultsPercentile.MarginalReflexDistance2 = abs(ResultsLeft.MarginalReflexDistance2 - ResultsRight.MarginalReflexDistance2)*100/ResultsRight.MarginalReflexDistance2
         ResultsPercentile.CommissureExcursion = abs(ResultsLeft.CommissureExcursion - ResultsRight.CommissureExcursion)*100/ResultsRight.CommissureExcursion
-        ResultsPercentile.SmileAngle = abs(ResultsLeft.SmileAngle - ResultsRight.SmileAngle)*100/ResultsRight.SmileAngle
-        ResultsPercentile.DentalShow = abs(ResultsLeft.DentalShow - ResultsRight.DentalShow)*100/ResultsRight.DentalShow
+        ResultsPercentile.SmileAngle = abs(ResultsLeft.SmileAngle - ResultsRight.SmileAngle)*100/ResultsRight.SmileAngle        
+        if ResultsRight.DentalShow > 0:
+            ResultsPercentile.DentalShow = abs(ResultsLeft.DentalShow - ResultsRight.DentalShow)*100/ResultsRight.DentalShow
+        else:
+            ResultsPercentile.DentalShow =0     
     
 
     

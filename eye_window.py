@@ -37,7 +37,7 @@ class ProcessEye(QtWidgets.QDialog):
         self.buttonDone.clicked.connect(self.handleReturn)
         
         layout = QtWidgets.QGridLayout(self)
-        layout.addWidget(self.label_title,0,0,1,1)
+        layout.addWidget(self.label_title,0,0,1,2)
         layout.addWidget(self.view,1,0,1,2)
         layout.addWidget(self.buttonDone,2,0,1,1)
         layout.addWidget(self.buttonReset,2,1,1,1)

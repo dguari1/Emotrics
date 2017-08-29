@@ -25,13 +25,16 @@ from measurements import get_measurements_from_data
 
 from utilities import estimate_lines
 from utilities import get_info_from_txt
-from utilities import get_landmarks
-from utilities import get_pupil_from_image
+#from utilities import get_landmarks
+#from utilities import get_pupil_from_image
 from utilities import mark_picture
 from utilities import save_snaptshot_to_file
 from utilities import save_txt_file
 from utilities import save_xls_file
 from utilities import save_xls_file_patient
+
+from ProcessLandmarks import GetLandmarks
+
 
 
 """
@@ -115,6 +118,12 @@ class window(QtWidgets.QWidget):
         self._tab2_results = None         
         self._tab3_results = None    
         self._toggle_landmaks = True
+        
+        
+        # create Thread  to take care of the landmarks and iris estimation   
+        self.thread_landmarks = QtCore.QThread()  # no parent!
+      
+        #initialize the User Interface
         self.initUI()
         
     def initUI(self):
@@ -493,7 +502,8 @@ class window(QtWidgets.QWidget):
                 self.displayImage._righteye[2] = self.displayImage._lefteye[2]
             elif self.displayImage._lefteye[2] == self.displayImage._righteye[2]:
                 pass
-        self.displayImage.set_update_photo()  
+            
+            self.displayImage.set_update_photo()  
         
         
     def face_center(self):
@@ -527,28 +537,65 @@ class window(QtWidgets.QWidget):
                 self._new_window.close()
             #load image
             self.displayImage._opencvimage = cv2.imread(name)
-            
+
             #if the photo was already processed then get the information for the
             #txt file, otherwise process the photo using the landmark ans pupil
             #localization algorithms 
             file_txt=name[:-4]
             file_txt = (file_txt + '.txt')
             if os.path.isfile(file_txt):
+                print(name)
                 shape,lefteye,righteye = get_info_from_txt(file_txt)
                 self.displayImage._lefteye = lefteye
                 self.displayImage._righteye = righteye 
                 self.displayImage._shape = shape
                 self.displayImage._points = None
+                self.displayImage.update_view()
             else:
-                #otherwise, get the landmarks using delib and the iris using 
-                #Dougman's algorithm 
-                self.displayImage._shape = get_landmarks(self.displayImage._opencvimage)
-                if self.displayImage._shape is not None:
-                    self.displayImage._lefteye = get_pupil_from_image(self.displayImage._opencvimage, self.displayImage._shape, 'left')
-                    self.displayImage._righteye = get_pupil_from_image(self.displayImage._opencvimage, self.displayImage._shape, 'right')
-                self.displayImage._points = None
+                #otherwise, get the landmarks using dlib, and the and the iris 
+                #using Dougman's algorithm  
+                #This is done in a separate thread to prevent the gui from 
+                #freezing and crashing
+                
+
+                #create worker, pass the image to the worker
+                self.landmarks = GetLandmarks(self.displayImage._opencvimage)
+                #move worker to new thread
+                self.landmarks.moveToThread(self.thread_landmarks)
+                #start the new thread where the landmark processing will be performed
+                self.thread_landmarks.start() 
+                #Connect Thread started signal to Worker operational slot method
+                self.thread_landmarks.started.connect(self.landmarks.getlandmarks)
+                #connect signal emmited by landmarks to a function
+                self.landmarks.landmarks.connect(self.ProcessShape)
+                #define the end of the thread
+                self.landmarks.finished.connect(self.thread_landmarks.quit) 
+                               
             
-            self.displayImage.update_view()
+    def ProcessShape(self, shape, numFaces, lefteye, righteye):
+        if numFaces == 1 :
+            self.displayImage._shape = shape
+            self.displayImage._lefteye = lefteye
+            self.displayImage._righteye = righteye
+            #
+            self.displayImage._points = None
+        elif numFaces == 0:
+            #no face in image then shape is None
+            self.displayImage._shape = None
+            #inform the user
+            QtWidgets.QMessageBox.warning(self,"Warning",
+                    "No face in the image.\nIf the image does contain a face plase modify the brightness and try again.",
+                        QtWidgets.QMessageBox.Ok, QtWidgets.QMessageBox.NoButton)
+        elif numFaces > 1:
+            #multiple faces in image then shape is None
+            self.displayImage._shape = None
+            #inform the user
+            QtWidgets.QMessageBox.warning(self,"Warning",
+                    "Multiple faces in the image.\nPlease load an image with a single face.",
+                        QtWidgets.QMessageBox.Ok, QtWidgets.QMessageBox.NoButton)
+          
+        self.displayImage.update_view()
+            
             
     def toggle_landmarks(self):
         #Hide - show the landmarks 

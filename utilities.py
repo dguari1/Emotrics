@@ -112,7 +112,7 @@ def mark_picture(image, shape, circle_left, circle_right, points = None):
         cv2.circle(image, 
                tuple([int(circle_left[0]),
                int(circle_left[1])]),
-               int(w/200),(0,255,0),-1)
+               int(circle_left[2]/4),(0,255,0),-1)
     
     #draw right iris
     if circle_right[2]>0:
@@ -123,7 +123,7 @@ def mark_picture(image, shape, circle_left, circle_right, points = None):
         cv2.circle(image, 
                tuple([int(circle_right[0]),
                int(circle_right[1])]),
-               int(w/200),(0,255,0),-1)
+               int(circle_right[2]/4),(0,255,0),-1)
     
     return image
 
@@ -201,7 +201,7 @@ def find_circle_from_points(x,y):
     #circle.append((int(xc_1),int(yc_1),int(R_1)))
     
     return circle
-
+#this function has been deprecated, the landmark localization is now performed in a separate thread. See Landmaks.py
 def get_landmarks(image):
     #function to automatically localize the landmarks in the a face image using 
     #dlib algorithm 
