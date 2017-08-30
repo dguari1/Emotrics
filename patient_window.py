@@ -10,12 +10,15 @@ import cv2
 import time
 from PyQt5 import QtWidgets
 from PyQt5 import QtGui
+from PyQt5 import QtCore
 from PyQt5.QtWidgets import QLabel, QLineEdit, QPushButton, QGridLayout, QFileDialog, QDialog
 
 
 from utilities import get_info_from_txt
-from utilities import get_landmarks
-from utilities import get_pupil_from_image
+#from utilities import get_landmarks
+#from utilities import get_pupil_from_image
+
+from ProcessLandmarks import GetLandmarks
 
 
 """
@@ -78,6 +81,19 @@ class CreatePatient(QDialog):
                                 #however, if the subject presses 'Done' and all
                                 #the conditions are fullfiled then 
                                 #_ExitFlag = True
+                                
+                                
+        #the estimation of landmarks and iris radius will be performed in a 
+        #different thread to prevent the UI from freezing and crashing
+        # create Thread  to take care of the landmarks and iris estimation   
+        self.thread_landmarks = QtCore.QThread()  # no parent!
+        
+        self._Photo = None #this variable will contain the image
+        self._file_name = None #this variable will contain the path + file name
+        self._name = None #this variable will contain the file name
+        self._PhotoPosition = None #First or second photo, this variable will carry that information
+        
+        
         self.initUI()
         
     def initUI(self):
@@ -244,17 +260,23 @@ class CreatePatient(QDialog):
         else:
             #if windows then transform / to \ (python stuffs)
             name = os.path.normpath(name)
+            #load image into memory 
+            self._Photo = cv2.imread(name)
+            #is this information going to be the first or second photo, that 
+            #information is in the variable 'position'
+            self._PhotoPosition = position
+
+            #get the image name (separete it from the path)
             delimiter = os.path.sep
             split_name=name.split(delimiter)
             
-            #create a temporary photo object and fill its values
-            temp_photo = PhotoObject()
-            
-            #the variable name contains the file name and the path, we now
+            #the variable 'name' contains the file name and the path, we now
             #get the file name and assign it to the photo object
-            temp_photo._file_name = name
-            temp_photo._name = split_name[-1]
-            temp_photo._photo = cv2.imread(name)
+            self._file_name = name
+            self._name = split_name[-1]
+            
+            
+
             
             #if the photo was already processed then get the information for the
             #txt file, otherwise process the photo using the landmark ans pupil
@@ -263,40 +285,108 @@ class CreatePatient(QDialog):
             file_txt = (file_txt + '.txt')
             if os.path.isfile(file_txt):
                 shape,lefteye,righteye = get_info_from_txt(file_txt)
+                
+                #create a temporary photo object and fill its values. This variable
+                #contains all the information that will be passed to the main 
+                #window 
+                temp_photo = PhotoObject()
+                temp_photo._file_name = self._file_name
+                temp_photo._name = self._name
+                temp_photo._photo = self._Photo                
                 temp_photo._lefteye = lefteye
                 temp_photo._righteye = righteye 
                 temp_photo._shape = shape
                 temp_photo._points = None
+                
+                #put all the information in the correct place (according to 
+                #'position')
+                self.AssignPhoto(temp_photo, self._PhotoPosition, 1)
             else:
-                #otherwise, get the landmarks using delib and the iris using 
-                #Dougman's algorithm 
-                temp_photo._shape = get_landmarks(temp_photo._photo)
-                if temp_photo._shape is not None:
-                    temp_photo._lefteye = get_pupil_from_image(temp_photo._photo, temp_photo._shape, 'left')
-                    temp_photo._righteye = get_pupil_from_image(temp_photo._photo, temp_photo._shape, 'right')
-                temp_photo._points = None
+                #otherwise, get the landmarks using dlib, and the and the iris 
+                #using Dougman's algorithm  
+                #This is done in a separate thread to prevent the gui from 
+                #freezing and crashing
+                
+                #create worker, pass the image to the worker
+                self.landmarks = GetLandmarks(self._Photo)
+                #move worker to new thread
+                self.landmarks.moveToThread(self.thread_landmarks)
+                #start the new thread where the landmark processing will be performed
+                self.thread_landmarks.start() 
+                #Connect Thread started signal to Worker operational slot method
+                self.thread_landmarks.started.connect(self.landmarks.getlandmarks)
+                #connect signal emmited by landmarks to a function
+                self.landmarks.landmarks.connect(self.ProcessShape)
+                #define the end of the thread
+                self.landmarks.finished.connect(self.thread_landmarks.quit) 
+                
+                
+                
+    def ProcessShape(self, shape, numFaces, lefteye, righteye):
+        #the process that occured in another thread provide the shape and iris
+        #information, if there is only one face then we store that information 
+        #in a temporal variable 'temp_photo' and pass that to the main window 
+        temp_photo = PhotoObject()
+        if numFaces == 1 :            
+            temp_photo._file_name = self._file_name
+            temp_photo._name = self._name
+            temp_photo._photo = self._Photo     
+            temp_photo._shape = shape
+            temp_photo._lefteye = lefteye
+            temp_photo._righteye = righteye
+            temp_photo._points = None
             
-            #decide whether the user loaded the first or second photo 
-            if position is 'first':
-                setattr(self._Patient, 'FirstPhoto', temp_photo)
-                #self._Patient.FirstPhoto = temp_photo
-                if self._Patient.FirstPhoto._shape is not None:
-                    #present the file name to the user 
-                    self._FirstPhoto_name.setText(temp_photo._name)
-                else:
-                    #if there is not ladmark information (not face or 
-                    #multiple faces) then inform that the file is invalid
-                    self._FirstPhoto_name.setText('Invalid file')    
-            elif position is 'second':
-                setattr(self._Patient, 'SecondPhoto', temp_photo)
-                #self._Patient.SecondPhoto = temp_photo
-                if self._Patient.SecondPhoto._shape is not None:
-                    #present the file name to the user 
-                    self._SecondPhoto_name.setText(temp_photo._name)
-                else:
-                    #if there is not ladmark information (not face or 
-                    #multiple faces) then inform that the file is invalid
-                    self._SecondPhoto_name.setText('Invalid file')   
+            #put all the information in the correct place (according to 
+            #'position')
+            self.AssignPhoto(temp_photo, self._PhotoPosition, numFaces)
+        else: 
+            #no face in image then shape is None
+            
+            #put all the information in the correct place (according to 
+            #'position')
+            self.AssignPhoto(temp_photo, self._PhotoPosition, numFaces)
+
+
+    def AssignPhoto(self, photo_info, position, numFaces):
+        #decideAssign whether the user loaded the first or second photo 
+        if position is 'first':
+            setattr(self._Patient, 'FirstPhoto', photo_info)
+            #self._Patient.FirstPhoto = temp_photo
+            if self._Patient.FirstPhoto._shape is not None:
+                #present the file name to the user 
+                self._FirstPhoto_name.setText(photo_info._name)
+            else:
+                #if there is not ladmark information (not face or 
+                #multiple faces) then inform that the file is invalid
+                self._FirstPhoto_name.setText('Invalid file')
+                if numFaces == 0:
+                    QtWidgets.QMessageBox.warning(self,"Warning",
+                    "No face in the image.\nIf the image does contain a face plase modify the brightness and try again.",
+                        QtWidgets.QMessageBox.Ok, QtWidgets.QMessageBox.NoButton)
+                elif numFaces > 1:
+                    QtWidgets.QMessageBox.warning(self,"Warning",
+                    "Multiple faces in the image.\nPlease load an image with a single face.",
+                        QtWidgets.QMessageBox.Ok, QtWidgets.QMessageBox.NoButton)
+    
+        elif position is 'second':
+            setattr(self._Patient, 'SecondPhoto', photo_info)
+            #self._Patient.SecondPhoto = temp_photo
+            if self._Patient.SecondPhoto._shape is not None:
+                #present the file name to the user 
+                self._SecondPhoto_name.setText(photo_info._name)
+            else:
+                #if there is not ladmark information (not face or 
+                #multiple faces) then inform that the file is invalid
+                self._SecondPhoto_name.setText('Invalid file')
+                if numFaces == 0:
+                    QtWidgets.QMessageBox.warning(self,"Warning",
+                    "No face in the image.\nIf the image does contain a face plase modify the brightness and try again.",
+                        QtWidgets.QMessageBox.Ok, QtWidgets.QMessageBox.NoButton)
+                elif numFaces > 1:
+                    QtWidgets.QMessageBox.warning(self,"Warning",
+                    "Multiple faces in the image.\nPlease load an image with a single face.",
+                        QtWidgets.QMessageBox.Ok, QtWidgets.QMessageBox.NoButton)
+        
                                 
         
 if __name__ == '__main__':

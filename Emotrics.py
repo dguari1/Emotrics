@@ -118,6 +118,7 @@ class window(QtWidgets.QWidget):
         self._tab2_results = None         
         self._tab3_results = None    
         self._toggle_landmaks = True
+        self._toggle_lines = True
         
         
         # create Thread  to take care of the landmarks and iris estimation   
@@ -510,11 +511,18 @@ class window(QtWidgets.QWidget):
         #find a line connecting the center of both iris and then fit a perperdicular
         #line in the middle
         if self.displayImage._shape is not None:
-            points =  estimate_lines(self.displayImage._opencvimage, 
+            
+            if self._toggle_lines == True:
+                self._toggle_lines = False
+                points =  estimate_lines(self.displayImage._opencvimage, 
                                      self.displayImage._lefteye, 
                                      self.displayImage._righteye)
-            self.displayImage._points = points
-            self.displayImage.set_update_photo()
+                self.displayImage._points = points
+                self.displayImage.set_update_photo()
+            else:
+                self.displayImage._points = None
+                self.displayImage.set_update_photo()
+                self._toggle_lines = True    
             
             
     def load_file(self):
