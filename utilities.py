@@ -10,9 +10,9 @@ import cv2
 from scipy import linalg
 import pandas as pd
 
-from dlib import get_frontal_face_detector
-from dlib import shape_predictor
-from dlib import rectangle
+#from dlib import get_frontal_face_detector
+#from dlib import shape_predictor
+#from dlib import rectangle
 
 from measurements import get_measurements_from_data
 
@@ -77,6 +77,43 @@ def get_info_from_txt(file):
      
     lefteye=[left_pupil[0,0],left_pupil[0,1],left_pupil[0,2]]
     righteye=[right_pupil[0,0],right_pupil[0,1],right_pupil[0,2]]
+    
+    if lefteye[2] < 0 and righteye[2] >0:
+        #left eye is closed, use right iris diameter and locate iris in center of eye
+        lefteye[2] = righteye[2]           
+        x_eye = shape[42:47,0]
+        y_eye = shape[42:47,1]
+        lefteye[0] = int(np.round(np.mean(x_eye),0))
+        lefteye[1] = int(np.round(np.mean(y_eye),0))
+        #message = 'Left Eye Closed'
+         
+    if righteye[2] < 0 and lefteye[2] >0:
+        #Right eye is closed, use left iris diameter and locate iris in center of eye
+        righteye[2] = lefteye[2]
+        x_eye = shape[36:41,0]
+        y_eye = shape[36:41,1]
+        righteye[0] = int(np.round(np.mean(x_eye),0))
+        righteye[1] = int(np.round(np.mean(y_eye),0))
+        #message = 'Right Eye Closed'
+            
+    if righteye[2] < 0 and lefteye[2] <0:
+        #both eyes are closed, use 1/4 of eye lenght as radius
+        #and the center of mass of the eye as the center
+        
+        #for left eye 
+        x_eye = shape[42:47,0]
+        y_eye = shape[42:47,1]
+        lefteye[0] = int(np.round(np.mean(x_eye),0))
+        lefteye[1] = int(np.round(np.mean(y_eye),0))
+        lefteye[2] = int(np.round((shape[45,0]-lefteye[0])/2))
+        
+        #for right eye 
+        x_eye = shape[36:41,0]
+        y_eye = shape[36:41,1]
+        righteye[0] = int(np.round(np.mean(x_eye),0))
+        righteye[1] = int(np.round(np.mean(y_eye),0))
+        righteye[2] = int(np.round((shape[39,0]-righteye[0])/2))
+        #message = 'Both Eyes Closed'
            
     return shape, lefteye, righteye
 
@@ -593,6 +630,6 @@ def save_xls_file_patient(path,Patient):
     path=temp[:-1]
     path=delimiter.join(path)
 
-    file_name = path + delimiter + Patient.patient_ID +'.xls'
-    print(file_name)
+    file_name = path + delimiter + Patient.patient_ID +'.xlsx'
+    #print(file_name)
     df.to_excel(file_name,index = True)

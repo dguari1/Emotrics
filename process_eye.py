@@ -39,15 +39,18 @@ def get_iris_manual(Image, shape, position):
     #open the window to get the pupil
     EyeWindow = ProcessEye(temp_image)
     EyeWindow.exec_()
-    
+
     #return to full image coordinates 
     circle = EyeWindow._circle
-    if position == 'left':
-        circle[0] = circle[0]+x_left-5
-        circle[1] = circle[1]+y_left-5
-    elif position == 'right':
-        circle[0] = circle[0]+x_right-5
-        circle[1] = circle[1]+y_right-5
-            
-    #return circle information to main window
-    return circle
+    if circle is not None: #verify that the is something to return 
+        if position == 'left':
+            circle[0] = circle[0]+x_left-5
+            circle[1] = circle[1]+y_left-5
+        elif position == 'right':
+            circle[0] = circle[0]+x_right-5
+            circle[1] = circle[1]+y_right-5
+                
+        #return circle information to main window
+        return circle
+    else: #if the user didn't include the 4 points then return 'None'
+        return None

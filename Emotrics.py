@@ -552,7 +552,6 @@ class window(QtWidgets.QWidget):
             file_txt=name[:-4]
             file_txt = (file_txt + '.txt')
             if os.path.isfile(file_txt):
-                print(name)
                 shape,lefteye,righteye = get_info_from_txt(file_txt)
                 self.displayImage._lefteye = lefteye
                 self.displayImage._righteye = righteye 
@@ -618,8 +617,8 @@ class window(QtWidgets.QWidget):
     def save_snapshot(self):
         #save the current view 
         if self.displayImage._opencvimage is not None:
-        
-            name,_ = QtWidgets.QFileDialog.getSaveFileName(self, 'Save File','', 'png (*.png);;jpg (*.jpg);; jpeg (*.jpeg)')
+            proposed_name = self._file_name[:-4]+'-landmarks'
+            name,_ = QtWidgets.QFileDialog.getSaveFileName(self, 'Save File',proposed_name, 'png (*.png);;jpg (*.jpg);; jpeg (*.jpeg)')
             if not name:
                 pass
             else:
