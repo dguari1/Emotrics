@@ -142,8 +142,8 @@ class window(QtWidgets.QWidget):
         
         #toolbar         
         loadAction = QtWidgets.QAction(
-                QtGui.QIcon(scriptDir + os.path.sep + 'include' +os.path.sep +'icon_color'+ os.path.sep + 'load_icon.png'),
                 'Load image', self)
+        loadAction.setIcon(QtGui.QIcon(scriptDir + os.path.sep + 'include' +os.path.sep +'icon_color'+ os.path.sep + 'load_icon.png'))
         loadAction.triggered.connect(self.load_file)
         
         createPatientAction = QtWidgets.QAction(
@@ -534,6 +534,7 @@ class window(QtWidgets.QWidget):
         name,_ = QtWidgets.QFileDialog.getOpenFileName(
                 self,'Load Image',
                 '',"Image files (*.png *.jpg *.jpeg *.PNG *.JPG *.JPEG)")
+        
         if not name:
             pass
         else:
