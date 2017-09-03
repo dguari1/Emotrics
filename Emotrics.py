@@ -7,6 +7,7 @@ Created on Sat Aug 12 18:41:24 2017
 import os 
 import sys
 import cv2
+import numpy as np
 
 from PyQt5 import QtWidgets
 from PyQt5 import QtGui
@@ -141,64 +142,53 @@ class window(QtWidgets.QWidget):
         self.displayImage.setPhoto(img_show)    
         
         #toolbar         
-        loadAction = QtWidgets.QAction(
-                'Load image', self)
+        loadAction = QtWidgets.QAction('Load image', self)
         loadAction.setIcon(QtGui.QIcon(scriptDir + os.path.sep + 'include' +os.path.sep +'icon_color'+ os.path.sep + 'load_icon.png'))
         loadAction.triggered.connect(self.load_file)
         
-        createPatientAction = QtWidgets.QAction(
-                QtGui.QIcon(scriptDir + os.path.sep + 'include' +os.path.sep +'icon_color'+ os.path.sep + 'patient_icon.png'),
-                'Create patient', self)
+        createPatientAction = QtWidgets.QAction('Create patient', self)
+        createPatientAction.setIcon( QtGui.QIcon(scriptDir + os.path.sep + 'include' +os.path.sep +'icon_color'+ os.path.sep + 'patient_icon.png'))
         createPatientAction.triggered.connect(self.CreatePatient)
         
         #this action will be only active when a patient is created (i.e., there
         #are two photos to analize), that's why I'm making it a persisten 
         #element of the class, so that its state (Enble=True or Enable=False)
         #can be modified during the execution of the program 
-        self.changephotoAction = QtWidgets.QAction(
-                QtGui.QIcon(scriptDir + os.path.sep + 'include' +os.path.sep +'icon_color'+ os.path.sep + 'change_photo_icon.png'),
-                'Change image', self)
+        self.changephotoAction = QtWidgets.QAction('Change image', self)
+        self.changephotoAction.setIcon(QtGui.QIcon(scriptDir + os.path.sep + 'include' +os.path.sep +'icon_color'+ os.path.sep + 'change_photo_icon.png'))
         self.changephotoAction.setEnabled(False)
         self.changephotoAction.triggered.connect(self.ChangePhoto)
         
-        fitAction = QtWidgets.QAction(
-                QtGui.QIcon(scriptDir + os.path.sep + 'include' +os.path.sep +'icon_color'+ os.path.sep + 'fit_to_size_icon.png'),
-                'Fit image to window', self)
+        fitAction = QtWidgets.QAction('Fit image to window', self)
+        fitAction.setIcon(QtGui.QIcon(scriptDir + os.path.sep + 'include' +os.path.sep +'icon_color'+ os.path.sep + 'fit_to_size_icon.png'))
         fitAction.triggered.connect(self.displayImage.show_entire_image)
         
-        eyeAction = QtWidgets.QAction(
-                QtGui.QIcon(scriptDir + os.path.sep + 'include' +os.path.sep +'icon_color'+ os.path.sep + 'eye_icon.png'),
-                'Match iris diameter', self)
+        eyeAction = QtWidgets.QAction('Match iris diameter', self)
+        eyeAction.setIcon(QtGui.QIcon(scriptDir + os.path.sep + 'include' +os.path.sep +'icon_color'+ os.path.sep + 'eye_icon.png'))
         eyeAction.triggered.connect(self.match_iris)
         
-        centerAction = QtWidgets.QAction(
-                QtGui.QIcon(scriptDir + os.path.sep + 'include' +os.path.sep +'icon_color'+ os.path.sep + 'center_icon.png'),
-                'Find face center', self)
+        centerAction = QtWidgets.QAction('Find face center', self)
+        centerAction.setIcon(QtGui.QIcon(scriptDir + os.path.sep + 'include' +os.path.sep +'icon_color'+ os.path.sep + 'center_icon.png'))
         centerAction.triggered.connect(self.face_center)
         
-        toggleAction = QtWidgets.QAction(
-                QtGui.QIcon(scriptDir + os.path.sep + 'include' +os.path.sep +'icon_color'+ os.path.sep + 'toggle-icon.png'),
-                'Toggle landmarks', self)
+        toggleAction = QtWidgets.QAction('Toggle landmarks', self)
+        toggleAction.setIcon(QtGui.QIcon(scriptDir + os.path.sep + 'include' +os.path.sep +'icon_color'+ os.path.sep + 'toggle-icon.png'))
         toggleAction.triggered.connect(self.toggle_landmarks)
         
-        measuresAction = QtWidgets.QAction(
-                QtGui.QIcon(scriptDir + os.path.sep + 'include' +os.path.sep +'icon_color'+ os.path.sep + 'ruler_icon.png'),
-                'Facial metrics', self)
+        measuresAction = QtWidgets.QAction('Facial metrics', self)
+        measuresAction.setIcon(QtGui.QIcon(scriptDir + os.path.sep + 'include' +os.path.sep +'icon_color'+ os.path.sep + 'ruler_icon.png'))
         measuresAction.triggered.connect(self.create_new_window)
         
-        saveAction = QtWidgets.QAction(
-                QtGui.QIcon(scriptDir + os.path.sep + 'include' +os.path.sep +'icon_color'+ os.path.sep + 'save_icon.png'),
-                'Save results', self)
+        saveAction = QtWidgets.QAction('Save results', self)
+        saveAction.setIcon(QtGui.QIcon(scriptDir + os.path.sep + 'include' +os.path.sep +'icon_color'+ os.path.sep + 'save_icon.png'))
         saveAction.triggered.connect(self.save_results)
         
-        snapshotAction = QtWidgets.QAction(
-                QtGui.QIcon(scriptDir + os.path.sep + 'include' +os.path.sep +'icon_color'+ os.path.sep + 'snapshot_icon.png'),
-                'Save current view', self)
+        snapshotAction = QtWidgets.QAction('Save current view', self)
+        snapshotAction.setIcon(QtGui.QIcon(scriptDir + os.path.sep + 'include' +os.path.sep +'icon_color'+ os.path.sep + 'snapshot_icon.png'))
         snapshotAction.triggered.connect(self.save_snapshot)
         
-        exitAction = QtWidgets.QAction(
-                QtGui.QIcon(scriptDir + os.path.sep + 'include' +os.path.sep +'icon_color'+ os.path.sep + 'exit_icon.png'),
-                'Exit', self)
+        exitAction = QtWidgets.QAction('Exit', self)
+        exitAction.setIcon(QtGui.QIcon(scriptDir + os.path.sep + 'include' +os.path.sep +'icon_color'+ os.path.sep + 'exit_icon.png'))
         exitAction.triggered.connect(self.close_app)
                 
         
@@ -239,9 +229,9 @@ class window(QtWidgets.QWidget):
         if self._new_window is not None:
             self._new_window.close()
         
-        #delete previous patients is any is in memory
-        if self._Patient is not None:
-            self._Patient = None
+        ##delete previous patients is any is in memory
+        #if self._Patient is not None:
+        #    self._Patient = None
             
         temp = CreatePatient(self)
         temp.exec_()  #this action replaces temp.show()
@@ -252,6 +242,8 @@ class window(QtWidgets.QWidget):
         #verifry that the user actually created a patient and didn't just hit 
         #cancel        
         if temp._Patient is not None :
+            #if there is a new patient then:
+            
             #Assign the patient Class to the appropiate variable
             self._Patient = temp._Patient 
             
@@ -274,7 +266,7 @@ class window(QtWidgets.QWidget):
         
     def ChangePhoto(self):
         #function used to change the current photo of the patient
-        
+        self._toggle_lines = True #set the toggle lines to true
         #if this button is active it means that the patient was successfully 
         #created and there are two photos to work with. The user can use this
         #button to navigate between those two photos
@@ -504,6 +496,8 @@ class window(QtWidgets.QWidget):
             elif self.displayImage._lefteye[2] == self.displayImage._righteye[2]:
                 pass
             
+            self._toggle_lines = True 
+            self.displayImage._points = None
             self.displayImage.set_update_photo()  
         
         
@@ -526,9 +520,6 @@ class window(QtWidgets.QWidget):
             
             
     def load_file(self):
-        #the user will load an image so get rid of Patient functionality
-        self._Patient = None
-        self.changephotoAction.setEnabled(False)
         
         #load a file using the widget
         name,_ = QtWidgets.QFileDialog.getOpenFileName(
@@ -538,6 +529,11 @@ class window(QtWidgets.QWidget):
         if not name:
             pass
         else:
+            #the user will load an single image so get rid of Patient and the
+            # changephotoAction in the toolbar
+            self._Patient = None
+            self.changephotoAction.setEnabled(False)
+            
             #if windows then transform / to \ (python stuffs)
             name = os.path.normpath(name)
             self._file_name = name
@@ -560,7 +556,55 @@ class window(QtWidgets.QWidget):
                 self.displayImage._points = None
                 self.displayImage.update_view()
             else:
-                #otherwise, get the landmarks using dlib, and the and the iris 
+                #if the image is too large then it needs to be resized....
+                h,w,d = self.displayImage._opencvimage.shape
+
+                #if the image is too big then we need to resize it so that the landmark 
+                #localization process can be performed in a reasonable time 
+                if h > 1500 or w > 1500 :
+                    if h >= w :
+                        h_n = 1500
+                        Scale = h/h_n
+                        w_n = int(np.round(w/Scale,0))
+                        self.displayImage._opencvimage=cv2.resize(self.displayImage._opencvimage, (w_n, h_n), interpolation=cv2.INTER_AREA)
+                        #self._image = image
+                    else :
+                        w_n = 1500
+                        Scale = w/w_n
+                        h_n = int(np.round(h/Scale,0))
+                        self.displayImage._opencvimage=cv2.resize(self.displayImage._opencvimage, (w_n, h_n), interpolation=cv2.INTER_AREA)
+                        #self._image = image     
+                 
+                    
+                    #now that the image has been reduced, ask the user if the image 
+                    #should be saved for continue the processing, otherwise the 
+                    #processing cannot continue with the large image
+                    
+                    #get the image name (separete it from the path)
+                    delimiter = os.path.sep
+                    split_name=name.split(delimiter)
+            
+                    #the variable 'name' contains the file name and the path, we now
+                    #get the file name and assign it to the photo object
+                    file_name = split_name[-1]
+                    new_file_name = file_name[:-4]+'_small.png'
+                    
+                    choice = QtWidgets.QMessageBox.information(self, 'Large Image', 
+                            'The image is too large to process.\n\nPressing OK will create a new file\n%s\nin the current folder. This file will be used for processing.\nOtherwise, click Close to finalize the App.'%new_file_name, 
+                            QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.Close, QtWidgets.QMessageBox.Ok)
+
+                    if choice == QtWidgets.QMessageBox.Close :
+                        self.close()
+                        app.exec_()
+                    else:
+                        #create a new, smaller image and use that for processing
+                        name = name[:-4]+'_small.png'
+                        self._file_name = name
+                        cv2.imwrite(name,self.displayImage._opencvimage)
+                else:
+                    pass
+                
+                #get the landmarks using dlib, and the and the iris 
                 #using Dougman's algorithm  
                 #This is done in a separate thread to prevent the gui from 
                 #freezing and crashing

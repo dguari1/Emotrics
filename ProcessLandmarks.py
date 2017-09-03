@@ -37,8 +37,11 @@ class GetLandmarks(QObject):
         predictor = shape_predictor(scriptDir + os.path.sep + 'include' +os.path.sep +'data'+ os.path.sep + 'shape_predictor_68_face_landmarks.dat')
         #make a local copy of the image
         image = self._image.copy()
-        #transform to gray 
-        gray=cv2.cvtColor(image,cv2.COLOR_BGR2GRAY)
+        h,w,d = image.shape
+                        
+        if d > 1:
+            #transform to gray 
+            gray=cv2.cvtColor(image,cv2.COLOR_BGR2GRAY)
         #resize to speed up face dectection
         height, width = gray.shape[:2]  
         newWidth=200
@@ -48,6 +51,8 @@ class GetLandmarks(QObject):
 
         #detect face in image using dlib.get_frontal_face_detector()
         rects = detector(smallImage,1)
+        
+        rects = detector (gray,1)
         if len(rects) == 1:   
             #now we have only one face in the image
             #function to obtain facial landmarks using dlib 
@@ -65,11 +70,13 @@ class GetLandmarks(QObject):
                         bottom=int(rect.bottom() * ScalingFactor))
        
                 #predict facial landmarks 
-                shape_dlib = predictor(image, mod_rect)   
+                #shape_dlib = predictor(image, mod_rect)   
+                shape_dlib = predictor(gray, rect) 
                 #transform shape object to np.matrix type
                 for k in range(0,68):
                     self._shape[k] = (shape_dlib.part(k).x, shape_dlib.part(k).y)
-            
+                    if self._shape[k,0]<= 0 : self._shape[k,0] = 1
+                    if self._shape[k,1]<= 0 : self._shape[k,1] = 1
             
             #the landmarks where properly estimated, now find the iris
             #the function get_iris will update the variables _lefteye and _righteye
@@ -103,9 +110,11 @@ class GetLandmarks(QObject):
         h_left = (max(self._shape[46,1],self._shape[47,1])-y_left)
         Eye = self._image.copy()
         Eye = Eye[(y_left-5):(y_left+h_left+5),(x_left-5):(x_left+w_left+5)]
+  
         selected_circle_left = self.process_eye(Eye)
-        selected_circle_left[0]=selected_circle_left[0]+x_left-5
-        selected_circle_left[1]=selected_circle_left[1]+y_left-5
+        selected_circle_left[0]=int(selected_circle_left[0])+x_left-5
+        selected_circle_left[1]=int(selected_circle_left[1])+y_left-5
+        selected_circle_left[2]=int(selected_circle_left[2])
         
         self._lefteye = selected_circle_left
         
@@ -116,9 +125,11 @@ class GetLandmarks(QObject):
         h_right = (max(self._shape[41,1],self._shape[40,1])-y_right)
         Eye = self._image.copy()
         Eye = Eye[(y_right-5):(y_right+h_right+5),(x_right-5):(x_right+w_right+5)]
+        
         selected_circle_right = self.process_eye(Eye)
-        selected_circle_right[0]=selected_circle_right[0]+x_right-5
-        selected_circle_right[1]=selected_circle_right[1]+y_right-5 
+        selected_circle_right[0]=int(selected_circle_right[0])+x_right-5
+        selected_circle_right[1]=int(selected_circle_right[1])+y_right-5
+        selected_circle_right[2]=int(selected_circle_right[2])
             
         self._righteye = selected_circle_right
             

@@ -7,6 +7,7 @@ Created on Sat Aug 19 12:54:17 2017
 
 import os
 import cv2
+import numpy as np
 import time
 from PyQt5 import QtWidgets
 from PyQt5 import QtGui
@@ -302,7 +303,60 @@ class CreatePatient(QDialog):
                 #'position')
                 self.AssignPhoto(temp_photo, self._PhotoPosition, 1)
             else:
-                #otherwise, get the landmarks using dlib, and the and the iris 
+                                #if the image is too large then it needs to be resized....
+                h,w,d = self._Photo.shape
+
+                #if the image is too big then we need to resize it so that the landmark 
+                #localization process can be performed in a reasonable time 
+                if h > 1500 or w > 1500 :
+                    if h >= w :
+                        h_n = 1500
+                        Scale = h/h_n
+                        w_n = int(np.round(w/Scale,0))
+                        self._Photo=cv2.resize(self._Photo, (w_n, h_n), interpolation=cv2.INTER_AREA)
+                        #self._image = image
+                    else :
+                        w_n = 1500
+                        Scale = w/w_n
+                        h_n = int(np.round(h/Scale,0))
+                        self._Photo=cv2.resize(self._Photo, (w_n, h_n), interpolation=cv2.INTER_AREA)
+                        #self._image = image     
+                 
+                    
+                    #now that the image has been reduced, ask the user if the image 
+                    #should be saved for continue the processing, otherwise the 
+                    #processing cannot continue with the large image
+                    
+                    #get the image name (separete it from the path)
+                    delimiter = os.path.sep
+                    split_name=name.split(delimiter)
+            
+                    #the variable 'name' contains the file name and the path, we now
+                    #get the file name and assign it to the photo object
+                    file_name = split_name[-1]
+                    new_file_name = file_name[:-4]+'_small.png'
+                    
+                    choice = QtWidgets.QMessageBox.information(self, 'Large Image', 
+                            'The image is too large to process.\n\nPressing OK will create a new file\n%s\nin the current folder. This file will be used for processing.\nOtherwise, click Close to finalize the App.'%new_file_name, 
+                            QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.Close, QtWidgets.QMessageBox.Ok)
+
+                    if choice == QtWidgets.QMessageBox.Close :
+                        self.close()
+                        app.exec_()
+                    else:
+                        #create a new, smaller image and use that for processing
+                        name = name[:-4]+'_small.png'
+                        self._file_name = name
+                        cv2.imwrite(name,self._Photo)
+                        
+                        self._name = self._name[:-4]+'_small.png'
+                else:
+                    pass
+                
+                
+                
+                
+                #get the landmarks using dlib, and the and the iris 
                 #using Dougman's algorithm  
                 #This is done in a separate thread to prevent the gui from 
                 #freezing and crashing
