@@ -549,10 +549,11 @@ class window(QtWidgets.QWidget):
             file_txt=name[:-4]
             file_txt = (file_txt + '.txt')
             if os.path.isfile(file_txt):
-                shape,lefteye,righteye = get_info_from_txt(file_txt)
+                shape,lefteye,righteye,boundingbox = get_info_from_txt(file_txt)
                 self.displayImage._lefteye = lefteye
                 self.displayImage._righteye = righteye 
                 self.displayImage._shape = shape
+                self.displayImage._boundingbox = boundingbox
                 self.displayImage._points = None
                 self.displayImage.update_view()
             else:
@@ -624,11 +625,13 @@ class window(QtWidgets.QWidget):
                 self.landmarks.finished.connect(self.thread_landmarks.quit) 
                                
             
-    def ProcessShape(self, shape, numFaces, lefteye, righteye):
+    def ProcessShape(self, shape, numFaces, lefteye, righteye, boundingbox):
         if numFaces == 1 :
             self.displayImage._shape = shape
             self.displayImage._lefteye = lefteye
             self.displayImage._righteye = righteye
+            self.displayImage._boundingbox = boundingbox
+            print(self.displayImage._boundingbox)
             #
             self.displayImage._points = None
         elif numFaces == 0:
@@ -682,12 +685,12 @@ class window(QtWidgets.QWidget):
         if self._Patient is None: #this implies that there is a single photo
             if self._file_name is not None:
                 if self.displayImage._shape is not None:
-                    save_txt_file(self._file_name, self.displayImage._shape, self.displayImage._lefteye, self.displayImage._righteye)
+                    save_txt_file(self._file_name, self.displayImage._shape, self.displayImage._lefteye, self.displayImage._righteye, self.displayImage._boundingbox)
                     MeasurementsLeft, MeasurementsRight, MeasurementsDeviation, MeasurementsPercentual = get_measurements_from_data(self.displayImage._shape, self.displayImage._lefteye, self.displayImage._righteye)
                     save_xls_file(self._file_name, MeasurementsLeft, MeasurementsRight, MeasurementsDeviation, MeasurementsPercentual)
         else:#this implies that the user created a patient and wants to analize two photos
-            save_txt_file(self._Patient.FirstPhoto._file_name, self._Patient.FirstPhoto._shape, self._Patient.FirstPhoto._lefteye, self._Patient.FirstPhoto._righteye)    
-            save_txt_file(self._Patient.SecondPhoto._file_name, self._Patient.SecondPhoto._shape, self._Patient.SecondPhoto._lefteye, self._Patient.SecondPhoto._righteye)
+            save_txt_file(self._Patient.FirstPhoto._file_name, self._Patient.FirstPhoto._shape, self._Patient.FirstPhoto._lefteye, self._Patient.FirstPhoto._righteye,  self._Patient.FirstPhoto._boundingbox)    
+            save_txt_file(self._Patient.SecondPhoto._file_name, self._Patient.SecondPhoto._shape, self._Patient.SecondPhoto._lefteye, self._Patient.SecondPhoto._righteye, self._Patient.SecondPhoto._boundingbox)
             save_xls_file_patient(self._file_name,self._Patient)
 
             

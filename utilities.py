@@ -31,10 +31,11 @@ def shape_to_np(shape,dtype="int"):
     return coords
 
 def get_info_from_txt(file):
-    #function to read the landmark and iris location from txt files
+    #function to read the landmark, iris and bounding box location from txt files
     shape=np.zeros((68,2),dtype=int)
     left_pupil = np.zeros((1,3),dtype=int)
     right_pupil = np.zeros((1,3),dtype=int)
+    bounding_box = np.zeros((1,4),dtype=int)
     
     cont_landmarks = 0
     get_landmarks = 0
@@ -44,6 +45,9 @@ def get_info_from_txt(file):
     
     get_rightpupil = 0
     cont_rightpupil = 0
+    
+    get_boundingbox = 0
+    cont_boundingbox = 0 
     with open(file, 'r') as file:
         for i,line in enumerate(file):    
             if i == 4:    
@@ -73,10 +77,24 @@ def get_info_from_txt(file):
                 
             if get_rightpupil == 1:            
                 right_pupil[0,cont_rightpupil]=int(line[:])
-                cont_rightpupil += 1      
+                cont_rightpupil += 1 
+                
+            if i == 84:
+                get_boundingbox = 1
+            if i == 88:
+                get_boundingbox = 0
+                 
+            if get_boundingbox == 1 :
+                bounding_box[0,cont_boundingbox] = int(line[:])
+                cont_boundingbox +=1
      
     lefteye=[left_pupil[0,0],left_pupil[0,1],left_pupil[0,2]]
     righteye=[right_pupil[0,0],right_pupil[0,1],right_pupil[0,2]]
+    
+    if cont_boundingbox > 0 :
+        boundingbox = [bounding_box[0,0],bounding_box[0,1],bounding_box[0,2],bounding_box[0,3]]    
+    else:
+        boundingbox = [0,0,0,0]
     
     if lefteye[2] < 0 and righteye[2] >0:
         #left eye is closed, use right iris diameter and locate iris in center of eye
@@ -115,7 +133,7 @@ def get_info_from_txt(file):
         righteye[2] = int(np.round((shape[39,0]-righteye[0])/2))
         #message = 'Both Eyes Closed'
            
-    return shape, lefteye, righteye
+    return shape, lefteye, righteye, boundingbox
 
 def mark_picture(image, shape, circle_left, circle_right, points = None):
     #function to draw on the image the landmaks, iris circles and lines
@@ -444,7 +462,7 @@ def save_snaptshot_to_file(image, name):
     cv2.imwrite(name,image)
     
     
-def save_txt_file(file_name,shape,circle_left,circle_right):
+def save_txt_file(file_name,shape,circle_left,circle_right, boundingbox):
     
     #save the file name, landmarks and iris position into a txt file
     
@@ -466,6 +484,9 @@ def save_txt_file(file_name,shape,circle_left,circle_right):
     
     np.savetxt(file_no_ext + '_temp_circle_right.txt', circle_right, delimiter=',',
                    fmt='%i', newline='\r\n')
+    
+    np.savetxt(file_no_ext + '_temp_boundingbox.txt', boundingbox, delimiter=',',
+                   fmt='%i', newline='\r\n')
         
     #create a new file that will contain the information, the file will have 
     #the same name as the original picture 
@@ -481,25 +502,31 @@ def save_txt_file(file_name,shape,circle_left,circle_right):
         f.write(photo_name)
         f.write('\n# } \n')
         
-        f.write('# 68 Landmarks [x,y] { \n')
+        f.write('# 68 facial Landmarks [x,y] { \n')
         with open(file_no_ext +'_temp_shape.txt','r') as temp_f:
             f.write(temp_f.read())
         f.write('# } \n')
             
-        f.write('# Left eye [x,y,r] { \n')
+        f.write('# Left iris [x,y,r] { \n')
         with open(file_no_ext + '_temp_circle_left.txt','r') as temp_f:
             f.write(temp_f.read())
         f.write('# } \n')
             
-        f.write('# Right eye [x,y,r] { \n')
+        f.write('# Right iris [x,y,r] { \n')
         with open(file_no_ext + '_temp_circle_right.txt','r') as temp_f:
             f.write(temp_f.read())
         f.write('# } \n')
+            
+        f.write('# Face bounding Box [top(x), left(y), width, height] { \n')
+        with open(file_no_ext + '_temp_boundingbox.txt','r') as temp_f:
+            f.write(temp_f.read())
+        f.write('# }')
         
     
     os.remove(file_no_ext +'_temp_shape.txt')
     os.remove(file_no_ext + '_temp_circle_left.txt')
     os.remove(file_no_ext + '_temp_circle_right.txt')
+    os.remove(file_no_ext + '_temp_boundingbox.txt')
     
 def save_xls_file(file_name, MeasurementsLeft, MeasurementsRight, MeasurementsDeviation, MeasurementsPercentual):
     #saves the facial metrics into a xls file. It works only for a single photo

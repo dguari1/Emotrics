@@ -41,6 +41,7 @@ class PhotoObject(object):
         self._lefteye = None
         self._righteye = None
         self._points = None
+        self._boundingbox = None
 
 class Patient(object):
     #this is all the information associated with a patient 
@@ -285,7 +286,7 @@ class CreatePatient(QDialog):
             file_txt=name[:-4]
             file_txt = (file_txt + '.txt')
             if os.path.isfile(file_txt):
-                shape,lefteye,righteye = get_info_from_txt(file_txt)
+                shape,lefteye,righteye, boundingbox = get_info_from_txt(file_txt)
                 
                 #create a temporary photo object and fill its values. This variable
                 #contains all the information that will be passed to the main 
@@ -296,9 +297,9 @@ class CreatePatient(QDialog):
                 temp_photo._photo = self._Photo                
                 temp_photo._lefteye = lefteye
                 temp_photo._righteye = righteye 
+                temp_photo._boundingbox = boundingbox
                 temp_photo._shape = shape
                 temp_photo._points = None
-                
                 #put all the information in the correct place (according to 
                 #'position')
                 self.AssignPhoto(temp_photo, self._PhotoPosition, 1)
@@ -376,7 +377,7 @@ class CreatePatient(QDialog):
                 
                 
                 
-    def ProcessShape(self, shape, numFaces, lefteye, righteye):
+    def ProcessShape(self, shape, numFaces, lefteye, righteye, boundingbox):
         #the process that occured in another thread provide the shape and iris
         #information, if there is only one face then we store that information 
         #in a temporal variable 'temp_photo' and pass that to the main window 
@@ -388,6 +389,7 @@ class CreatePatient(QDialog):
             temp_photo._shape = shape
             temp_photo._lefteye = lefteye
             temp_photo._righteye = righteye
+            temp_photo._boundingbox = boundingbox
             temp_photo._points = None
             
             #put all the information in the correct place (according to 

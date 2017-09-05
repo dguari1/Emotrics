@@ -46,6 +46,7 @@ class ImageViewer(QtWidgets.QGraphicsView):
         self._lefteye = None
         self._righteye = None
         self._opencvimage = None
+        self._boundingbox = None
         self._PointToModify = None
         self._points = None
         
