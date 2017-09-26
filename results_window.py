@@ -40,7 +40,7 @@ class CustomTabResult(QtWidgets.QWidget):
         self._label0a = QtWidgets.QLabel('Right')
         self._label0b = QtWidgets.QLabel('Left')
         self._label0c = QtWidgets.QLabel('Deviation (absolute)')
-        self._label0d = QtWidgets.QLabel('Deviation (percentual)')
+        self._label0d = QtWidgets.QLabel('Deviation (percent)')
         
         
         
