@@ -152,7 +152,7 @@ class CustomTabResult(QtWidgets.QWidget):
         pixmap_CE = QtGui.QPixmap.fromImage(QtGui.QImage(
         scriptDir + os.path.sep + 'include' +os.path.sep +'measures'+ os.path.sep + 'commissure_excursion.png'))
         text_CE_title = 'Commissure Excursion:'
-        text_CE_content = 'Distance from mid-vertical / lower lip vermillion junction point to the oral commissure'
+        text_CE_content = 'Distance from midline vertical / lower lip vermillion junction point to the oral commissure'
         self._help_CE.clicked.connect(lambda: self.push_help_CE(pixmap_CE, text_CE_title, text_CE_content))
         self._help_CE.setIconSize(QtCore.QSize(20,20))
         
@@ -161,7 +161,7 @@ class CustomTabResult(QtWidgets.QWidget):
         pixmap_SA = QtGui.QPixmap.fromImage(QtGui.QImage(
         scriptDir + os.path.sep + 'include' +os.path.sep +'measures'+ os.path.sep + 'smile_angle.png'))
         text_SA_title = 'Smile Angle:'
-        text_SA_content = 'Angle between the horizontal plane at the mid-vertical / lower lip vermillion junction point and the oral commissure'
+        text_SA_content = 'Angle between the horizontal plane at the midline vertical / lower lip vermillion junction point and the oral commissure'
         self._help_SA.clicked.connect(lambda: self.push_help_CE(pixmap_SA, text_SA_title, text_SA_content))
         self._help_SA.setIconSize(QtCore.QSize(20,20))
         
@@ -170,7 +170,7 @@ class CustomTabResult(QtWidgets.QWidget):
         pixmap_CH = QtGui.QPixmap.fromImage(QtGui.QImage(
         scriptDir + os.path.sep + 'include' +os.path.sep +'measures'+ os.path.sep + 'commissure_deviation_focus.png'))
         text_CH_title = 'Commissure Height Deviation:'
-        text_CH_content = 'Vertical distance (red line) between the horizontal plane of one oral commissure and the other'
+        text_CH_content = 'Vertical distance (red line) between the horizontal plane of the left and right oral commissure'
         self._help_CH.clicked.connect(lambda: self.push_help_CE(pixmap_CH, text_CH_title, text_CH_content))
         self._help_CH.setIconSize(QtCore.QSize(20,20))
         
@@ -195,7 +195,7 @@ class CustomTabResult(QtWidgets.QWidget):
         self._help_DS = QtWidgets.QPushButton('', self)
         self._help_DS.setIcon(QtGui.QIcon(scriptDir + os.path.sep + 'include' +os.path.sep +'icon_color'+ os.path.sep + 'question_icon.png'))
         pixmap_DS = QtGui.QPixmap.fromImage(QtGui.QImage(
-        scriptDir + os.path.sep + 'include' +os.path.sep +'measures'+ os.path.sep + 'dental_show.png'))
+        scriptDir + os.path.sep + 'include' +os.path.sep +'measures'+ os.path.sep + 'dental_show_focus.png'))
         text_DS_title = 'Dental Show:'
         text_DS_content = 'Vertical distance between the mucosal borders of the the upper and lower lip along the vertical plane taken halfway between the mid-vertical and the oral commissure'
         self._help_DS.clicked.connect(lambda: self.push_help_CE(pixmap_DS, text_DS_title, text_DS_content))
@@ -222,7 +222,7 @@ class CustomTabResult(QtWidgets.QWidget):
         self._help_BH = QtWidgets.QPushButton('', self)
         self._help_BH.setIcon(QtGui.QIcon(scriptDir + os.path.sep + 'include' +os.path.sep +'icon_color'+ os.path.sep + 'question_icon.png'))
         pixmap_BH = QtGui.QPixmap.fromImage(QtGui.QImage(
-        scriptDir + os.path.sep + 'include' +os.path.sep +'measures'+ os.path.sep + 'brow_height.png'))
+        scriptDir + os.path.sep + 'include' +os.path.sep +'measures'+ os.path.sep + 'brow_height_focus.png'))
         text_BH_title = 'Brow Height:'
         text_BH_content = 'Vertical distance from the mid-pupillary point to the superior border of the brow'        
         self._help_BH.clicked.connect(lambda: self.push_help_CE(pixmap_BH, text_BH_title, text_BH_content))

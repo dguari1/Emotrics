@@ -461,21 +461,21 @@ class window(QtWidgets.QWidget):
                 self._tab3_results  =  CustomTabResult()
                 
                 #filling tab3_results with the difference between the two photos
-                self._tab3_results._CE_right.setText('{0:.2f}'.format(MeasurementsRightFirst.CommissureExcursion-MeasurementsRightSecond.CommissureExcursion))
-                self._tab3_results._SA_right.setText('{0:.2f}'.format(MeasurementsRightFirst.SmileAngle-MeasurementsRightSecond.SmileAngle))
-                self._tab3_results._DS_right.setText('{0:.2f}'.format(MeasurementsRightFirst.DentalShow-MeasurementsRightSecond.DentalShow))
-                self._tab3_results._MRD1_right.setText('{0:.2f}'.format(MeasurementsRightFirst.MarginalReflexDistance1-MeasurementsRightSecond.MarginalReflexDistance1))
-                self._tab3_results._MRD2_right.setText('{0:.2f}'.format(MeasurementsRightFirst.MarginalReflexDistance2-MeasurementsRightSecond.MarginalReflexDistance2))
-                self._tab3_results._BH_right.setText('{0:.2f}'.format(MeasurementsRightFirst.BrowHeight-MeasurementsRightSecond.BrowHeight))
+                self._tab3_results._CE_right.setText('{0:.2f}'.format(-MeasurementsRightFirst.CommissureExcursion+MeasurementsRightSecond.CommissureExcursion))
+                self._tab3_results._SA_right.setText('{0:.2f}'.format(-MeasurementsRightFirst.SmileAngle+MeasurementsRightSecond.SmileAngle))
+                self._tab3_results._DS_right.setText('{0:.2f}'.format(-MeasurementsRightFirst.DentalShow+MeasurementsRightSecond.DentalShow))
+                self._tab3_results._MRD1_right.setText('{0:.2f}'.format(-MeasurementsRightFirst.MarginalReflexDistance1+MeasurementsRightSecond.MarginalReflexDistance1))
+                self._tab3_results._MRD2_right.setText('{0:.2f}'.format(-MeasurementsRightFirst.MarginalReflexDistance2+MeasurementsRightSecond.MarginalReflexDistance2))
+                self._tab3_results._BH_right.setText('{0:.2f}'.format(-MeasurementsRightFirst.BrowHeight+MeasurementsRightSecond.BrowHeight))
     
                 
                 #filling the info for the left
-                self._tab3_results._CE_left.setText('{0:.2f}'.format(MeasurementsLeftFirst.CommissureExcursion-MeasurementsLeftSecond.CommissureExcursion))
-                self._tab3_results._SA_left.setText('{0:.2f}'.format(MeasurementsLeftFirst.SmileAngle-MeasurementsLeftSecond.SmileAngle))
-                self._tab3_results._DS_left.setText('{0:.2f}'.format(MeasurementsLeftFirst.DentalShow-MeasurementsLeftSecond.DentalShow))
-                self._tab3_results._MRD1_left.setText('{0:.2f}'.format(MeasurementsLeftFirst.MarginalReflexDistance1-MeasurementsLeftSecond.MarginalReflexDistance1))
-                self._tab3_results._MRD2_left.setText('{0:.2f}'.format(MeasurementsLeftFirst.MarginalReflexDistance2-MeasurementsLeftSecond.MarginalReflexDistance2))
-                self._tab3_results._BH_left.setText('{0:.2f}'.format(MeasurementsLeftFirst.BrowHeight-MeasurementsLeftSecond.BrowHeight))
+                self._tab3_results._CE_left.setText('{0:.2f}'.format(-MeasurementsLeftFirst.CommissureExcursion+MeasurementsLeftSecond.CommissureExcursion))
+                self._tab3_results._SA_left.setText('{0:.2f}'.format(-MeasurementsLeftFirst.SmileAngle+MeasurementsLeftSecond.SmileAngle))
+                self._tab3_results._DS_left.setText('{0:.2f}'.format(-MeasurementsLeftFirst.DentalShow+MeasurementsLeftSecond.DentalShow))
+                self._tab3_results._MRD1_left.setText('{0:.2f}'.format(-MeasurementsLeftFirst.MarginalReflexDistance1+MeasurementsLeftSecond.MarginalReflexDistance1))
+                self._tab3_results._MRD2_left.setText('{0:.2f}'.format(-MeasurementsLeftFirst.MarginalReflexDistance2+MeasurementsLeftSecond.MarginalReflexDistance2))
+                self._tab3_results._BH_left.setText('{0:.2f}'.format(-MeasurementsLeftFirst.BrowHeight+MeasurementsLeftSecond.BrowHeight))
                 
                 
                 #say to the window that presents the results that there are 3 tabs
