@@ -6,6 +6,7 @@ Created on Sun Aug 27 18:17:25 2017
 """
 
 from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot
+from PyQt5 import QtWidgets, QtGui
 
 from dlib import get_frontal_face_detector
 from dlib import shape_predictor
@@ -51,6 +52,10 @@ class GetLandmarks(QObject):
 
         #detect face in image using dlib.get_frontal_face_detector()
         rects = detector(smallImage,1)
+        
+        if len(rects) == 0 : #if no face detected then try again with the full size image
+                rects = detector(gray,1)            
+        
         if len(rects) == 1:   
             #now we have only one face in the image
             #function to obtain facial landmarks using dlib 

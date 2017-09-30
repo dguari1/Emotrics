@@ -95,6 +95,8 @@ class CreatePatient(QDialog):
         self._name = None #this variable will contain the file name
         self._PhotoPosition = None #First or second photo, this variable will carry that information
         
+        self._Scale = 1
+        
         
         self.initUI()
         
@@ -256,7 +258,7 @@ class CreatePatient(QDialog):
         #load a file using the widget
         name,_ = QFileDialog.getOpenFileName(
                 self,'Load Image',
-                '',"Image files (*.png *.jpg *.jpeg *.PNG *.JPG *.JPEG)")
+                '',"Image files (*.png *.jpg *.jpeg *.tif *.tiff *.PNG *.JPG *.JPEG *.TIF *.TIFF)")
         if not name:
             pass
         else:
@@ -309,50 +311,54 @@ class CreatePatient(QDialog):
 
                 #if the image is too big then we need to resize it so that the landmark 
                 #localization process can be performed in a reasonable time 
+                self._Scale = 1
                 if h > 1500 or w > 1500 :
                     if h >= w :
                         h_n = 1500
-                        Scale = h/h_n
-                        w_n = int(np.round(w/Scale,0))
-                        self._Photo=cv2.resize(self._Photo, (w_n, h_n), interpolation=cv2.INTER_AREA)
+                        self._Scale = h/h_n
+                        w_n = int(np.round(w/self._Scale,0))
+                        #self._Photo=cv2.resize(self._Photo, (w_n, h_n), interpolation=cv2.INTER_AREA)
+                        temp_image = cv2.resize(self._Photo, (w_n, h_n), interpolation=cv2.INTER_AREA)
                         #self._image = image
                     else :
                         w_n = 1500
-                        Scale = w/w_n
-                        h_n = int(np.round(h/Scale,0))
-                        self._Photo=cv2.resize(self._Photo, (w_n, h_n), interpolation=cv2.INTER_AREA)
+                        self._Scale = w/w_n
+                        h_n = int(np.round(h/self._Scale,0))
+                        #self._Photo=cv2.resize(self._Photo, (w_n, h_n), interpolation=cv2.INTER_AREA)
+                        temp_image = cv2.resize(self._Photo, (w_n, h_n), interpolation=cv2.INTER_AREA)
                         #self._image = image     
                  
                     
-                    #now that the image has been reduced, ask the user if the image 
-                    #should be saved for continue the processing, otherwise the 
-                    #processing cannot continue with the large image
-                    
-                    #get the image name (separete it from the path)
-                    delimiter = os.path.sep
-                    split_name=name.split(delimiter)
-            
-                    #the variable 'name' contains the file name and the path, we now
-                    #get the file name and assign it to the photo object
-                    file_name = split_name[-1]
-                    new_file_name = file_name[:-4]+'_small.png'
-                    
-                    choice = QtWidgets.QMessageBox.information(self, 'Large Image', 
-                            'The image is too large to process.\n\nPressing OK will create a new file\n%s\nin the current folder. This file will be used for processing.\nOtherwise, click Close to finalize the App.'%new_file_name, 
-                            QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.Close, QtWidgets.QMessageBox.Ok)
-
-                    if choice == QtWidgets.QMessageBox.Close :
-                        self.close()
-                        app.exec_()
-                    else:
-                        #create a new, smaller image and use that for processing
-                        name = name[:-4]+'_small.png'
-                        self._file_name = name
-                        cv2.imwrite(name,self._Photo)
-                        
-                        self._name = self._name[:-4]+'_small.png'
+#                    #now that the image has been reduced, ask the user if the image 
+#                    #should be saved for continue the processing, otherwise the 
+#                    #processing cannot continue with the large image
+#                    
+#                    #get the image name (separete it from the path)
+#                    delimiter = os.path.sep
+#                    split_name=name.split(delimiter)
+#            
+#                    #the variable 'name' contains the file name and the path, we now
+#                    #get the file name and assign it to the photo object
+#                    file_name = split_name[-1]
+#                    new_file_name = file_name[:-4]+'_small.png'
+#                    
+#                    choice = QtWidgets.QMessageBox.information(self, 'Large Image', 
+#                            'The image is too large to process.\n\nPressing OK will create a new file\n%s\nin the current folder. This file will be used for processing.\nOtherwise, click Close to finalize the App.'%new_file_name, 
+#                            QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.Close, QtWidgets.QMessageBox.Ok)
+#
+#                    if choice == QtWidgets.QMessageBox.Close :
+#                        self.close()
+#                        app.exec_()
+#                    else:
+#                        #create a new, smaller image and use that for processing
+#                        name = name[:-4]+'_small.png'
+#                        self._file_name = name
+#                        cv2.imwrite(name,self._Photo)
+#                        
+#                        self._name = self._name[:-4]+'_small.png'
                 else:
-                    pass
+                    temp_image = self._Photo.copy()
+                    #pass
                 
                 
                 
@@ -363,7 +369,8 @@ class CreatePatient(QDialog):
                 #freezing and crashing
                 
                 #create worker, pass the image to the worker
-                self.landmarks = GetLandmarks(self._Photo)
+                ##self.landmarks = GetLandmarks(self._Photo)
+                self.landmarks = GetLandmarks(temp_image)
                 #move worker to new thread
                 self.landmarks.moveToThread(self.thread_landmarks)
                 #start the new thread where the landmark processing will be performed
@@ -383,6 +390,22 @@ class CreatePatient(QDialog):
         #in a temporal variable 'temp_photo' and pass that to the main window 
         temp_photo = PhotoObject()
         if numFaces == 1 :            
+            
+            if self._Scale is not 1: #in case that a smaller image was used for 
+                                     #processing, then update the landmark 
+                                     #position with the scale factor
+                for k in range(0,68):
+                    shape[k] = [int(np.round(shape[k,0]*self._Scale,0)) ,
+                                int(np.round(shape[k,1]*self._Scale,0))]
+                    
+                for k in range(0,3):
+                    lefteye[k] = int(np.round(lefteye[k]*self._Scale,0))
+                    righteye[k] = int(np.round(righteye[k]*self._Scale,0))
+                    
+                for k in range(0,4):
+                    boundingbox[k] = int(np.round(boundingbox[k]*self._Scale,0))
+                    
+            
             temp_photo._file_name = self._file_name
             temp_photo._name = self._name
             temp_photo._photo = self._Photo     

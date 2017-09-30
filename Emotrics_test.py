@@ -122,13 +122,6 @@ class window(QtWidgets.QWidget):
         self._toggle_lines = True
         
         
-        self._Scale = 1  #this variable carries the scale of the image if it 
-                        #needs to be resized, if Scale = 1 then the origina 
-                        #image was used for processing. If Scale > 1 then 
-                        #the original image was too large and a resized image
-                        #was used for processing
-        
-        
         # create Thread  to take care of the landmarks and iris estimation   
         self.thread_landmarks = QtCore.QThread()  # no parent!
       
@@ -531,7 +524,7 @@ class window(QtWidgets.QWidget):
         #load a file using the widget
         name,_ = QtWidgets.QFileDialog.getOpenFileName(
                 self,'Load Image',
-                '',"Image files (*.png *.jpg *.jpeg *.tif *.tiff *.PNG *.JPG *.JPEG *.TIF *.TIFF)")
+                '',"Image files (*.png *.jpg *.jpeg *.PNG *.JPG *.JPEG)")
         
         if not name:
             pass
@@ -569,53 +562,48 @@ class window(QtWidgets.QWidget):
 
                 #if the image is too big then we need to resize it so that the landmark 
                 #localization process can be performed in a reasonable time 
-                self._Scale = 1  #start from a clear initial scale
                 if h > 1500 or w > 1500 :
                     if h >= w :
                         h_n = 1500
-                        self._Scale = h/h_n
-                        w_n = int(np.round(w/self._Scale,0))
-                        #self.displayImage._opencvimage=cv2.resize(self.displayImage._opencvimage, (w_n, h_n), interpolation=cv2.INTER_AREA)
-                        temp_image = cv2.resize(self.displayImage._opencvimage, (w_n, h_n), interpolation=cv2.INTER_AREA)
+                        Scale = h/h_n
+                        w_n = int(np.round(w/Scale,0))
+                        self.displayImage._opencvimage=cv2.resize(self.displayImage._opencvimage, (w_n, h_n), interpolation=cv2.INTER_AREA)
                         #self._image = image
                     else :
                         w_n = 1500
-                        self._Scale = w/w_n
-                        h_n = int(np.round(h/self._Scale,0))
-                        #self.displayImage._opencvimage=cv2.resize(self.displayImage._opencvimage, (w_n, h_n), interpolation=cv2.INTER_AREA)
-                        temp_image = cv2.resize(self.displayImage._opencvimage, (w_n, h_n), interpolation=cv2.INTER_AREA)
+                        Scale = w/w_n
+                        h_n = int(np.round(h/Scale,0))
+                        self.displayImage._opencvimage=cv2.resize(self.displayImage._opencvimage, (w_n, h_n), interpolation=cv2.INTER_AREA)
                         #self._image = image     
                  
                     
-#                    #now that the image has been reduced, ask the user if the image 
-#                    #should be saved for continue the processing, otherwise the 
-#                    #processing cannot continue with the large image
-#                    
-#                    #get the image name (separete it from the path)
-#                    delimiter = os.path.sep
-#                    split_name=name.split(delimiter)
-#            
-#                    #the variable 'name' contains the file name and the path, we now
-#                    #get the file name and assign it to the photo object
-#                    file_name = split_name[-1]
-#                    new_file_name = file_name[:-4]+'_small.png'
-#                    
-#                    choice = QtWidgets.QMessageBox.information(self, 'Large Image', 
-#                            'The image is too large to process.\n\nPressing OK will create a new file\n%s\nin the current folder. This file will be used for processing.\nOtherwise, click Close to finalize the App.'%new_file_name, 
-#                            QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.Close, QtWidgets.QMessageBox.Ok)
-#
-#                    if choice == QtWidgets.QMessageBox.Close :
-#                        self.close()
-#                        app.exec_()
-#                    else:
-#                        #create a new, smaller image and use that for processing
-#                        name = name[:-4]+'_small.png'
-#                        self._file_name = name
-#                        cv2.imwrite(name,self.displayImage._opencvimage)
+                    #now that the image has been reduced, ask the user if the image 
+                    #should be saved for continue the processing, otherwise the 
+                    #processing cannot continue with the large image
+                    
+                    #get the image name (separete it from the path)
+                    delimiter = os.path.sep
+                    split_name=name.split(delimiter)
+            
+                    #the variable 'name' contains the file name and the path, we now
+                    #get the file name and assign it to the photo object
+                    file_name = split_name[-1]
+                    new_file_name = file_name[:-4]+'_small.png'
+                    
+                    choice = QtWidgets.QMessageBox.information(self, 'Large Image', 
+                            'The image is too large to process.\n\nPressing OK will create a new file\n%s\nin the current folder. This file will be used for processing.\nOtherwise, click Close to finalize the App.'%new_file_name, 
+                            QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.Close, QtWidgets.QMessageBox.Ok)
+
+                    if choice == QtWidgets.QMessageBox.Close :
+                        self.close()
+                        app.exec_()
+                    else:
+                        #create a new, smaller image and use that for processing
+                        name = name[:-4]+'_small.png'
+                        self._file_name = name
+                        cv2.imwrite(name,self.displayImage._opencvimage)
                 else:
-                    #the image is of appropiate dimensions so no need for modification
-                    temp_image = self.displayImage._opencvimage.copy()
-                    #pass
+                    pass
                 
                 #get the landmarks using dlib, and the and the iris 
                 #using Dougman's algorithm  
@@ -624,8 +612,7 @@ class window(QtWidgets.QWidget):
                 
 
                 #create worker, pass the image to the worker
-                #self.landmarks = GetLandmarks(self.displayImage._opencvimage)
-                self.landmarks = GetLandmarks(temp_image)
+                self.landmarks = GetLandmarks(self.displayImage._opencvimage)
                 #move worker to new thread
                 self.landmarks.moveToThread(self.thread_landmarks)
                 #start the new thread where the landmark processing will be performed
@@ -636,30 +623,15 @@ class window(QtWidgets.QWidget):
                 self.landmarks.landmarks.connect(self.ProcessShape)
                 #define the end of the thread
                 self.landmarks.finished.connect(self.thread_landmarks.quit) 
-
+                               
             
     def ProcessShape(self, shape, numFaces, lefteye, righteye, boundingbox):
         if numFaces == 1 :
-            
-            if self._Scale is not 1: #in case that a smaller image was used for 
-                                     #processing, then update the landmark 
-                                     #position with the scale factor
-                for k in range(0,68):
-                    shape[k] = [int(np.round(shape[k,0]*self._Scale,0)) ,
-                                int(np.round(shape[k,1]*self._Scale,0))]
-                    
-                for k in range(0,3):
-                    lefteye[k] = int(np.round(lefteye[k]*self._Scale,0))
-                    righteye[k] = int(np.round(righteye[k]*self._Scale,0))
-                    
-                for k in range(0,4):
-                    boundingbox[k] = int(np.round(boundingbox[k]*self._Scale,0))
-            
             self.displayImage._shape = shape
             self.displayImage._lefteye = lefteye
             self.displayImage._righteye = righteye
             self.displayImage._boundingbox = boundingbox
-            
+            print(self.displayImage._boundingbox)
             #
             self.displayImage._points = None
         elif numFaces == 0:
