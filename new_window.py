@@ -5,6 +5,7 @@ Created on Mon Aug 14 15:42:31 2017
 @author: GUARIND
 """
 import os
+import sys
 from PyQt5 import QtWidgets
 from PyQt5 import QtGui
 from PyQt5 import QtCore
@@ -15,7 +16,7 @@ class ShowResults(QtWidgets.QMainWindow):
         super(ShowResults, self).__init__()
         
         self.setWindowTitle('Metrics')
-        scriptDir = os.path.dirname(os.path.realpath(__file__))
+        scriptDir = os.path.dirname(os.path.realpath(sys.argv[0]))
         self.setWindowIcon(QtGui.QIcon(scriptDir + os.path.sep + 'include' +os.path.sep + 'ruler_icon.ico'))
         self._new_window = None
         

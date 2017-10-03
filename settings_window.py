@@ -81,7 +81,7 @@ class ShowSettings(QtWidgets.QWidget):
         super(ShowSettings, self).__init__(parent)
         
         self.setWindowTitle('Settings')
-        scriptDir = os.path.dirname(os.path.realpath(__file__))
+        scriptDir = os.path.dirname(os.path.realpath(sys.argv[0]))
         self.setWindowIcon(QtGui.QIcon(scriptDir + os.path.sep + 'include' +os.path.sep +'icon_color'+ os.path.sep + 'settings_icon.ico'))
         
         self.tab1 = CalibrationTab()

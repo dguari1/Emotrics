@@ -5,6 +5,7 @@ Created on Mon Aug 14 15:42:31 2017
 @author: Diego L.Guarin -- diego_guarin at meei.harvard.edu
 """
 import os
+import sys
 from PyQt5 import QtWidgets
 from PyQt5 import QtGui
 from PyQt5 import QtCore
@@ -26,7 +27,7 @@ class CustomTabResult(QtWidgets.QWidget):
         super(CustomTabResult, self) .__init__()
 
         
-        scriptDir = os.path.dirname(os.path.realpath(__file__))
+        scriptDir = os.path.dirname(os.path.realpath(sys.argv[0]))
                 
         spacerh = QtWidgets.QWidget(self)
         spacerh.setFixedSize(10,0)

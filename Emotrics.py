@@ -109,7 +109,7 @@ class window(QtWidgets.QWidget):
         super(window, self).__init__()
         #self.setGeometry(5,60,700,500)
         self.setWindowTitle('Emotrics')
-        scriptDir = os.path.dirname(os.path.realpath(__file__))
+        scriptDir = os.path.dirname(os.path.realpath(sys.argv[0]))
         self.setWindowIcon(QtGui.QIcon(scriptDir + os.path.sep + 'include' +os.path.sep +'icon_color'+ os.path.sep + 'meei_3WR_icon.ico'))
         
         self._new_window = None
@@ -137,7 +137,7 @@ class window(QtWidgets.QWidget):
         
     def initUI(self):
         #local directory
-        scriptDir = os.path.dirname(os.path.realpath(__file__))
+        scriptDir = os.path.dirname(os.path.realpath(sys.argv[0]))
 
         #image
         #read the image from file        

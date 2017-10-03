@@ -15,6 +15,7 @@ from dlib import rectangle
 import cv2
 import os
 import numpy as np
+import sys
 
 class GetLandmarks(QObject):
     
@@ -35,7 +36,7 @@ class GetLandmarks(QObject):
         #function to automatically localize the landmarks in the a face image using 
         #dlib algorithm 
         detector = get_frontal_face_detector()
-        scriptDir = os.path.dirname(os.path.realpath(__file__))
+        scriptDir = os.path.dirname(os.path.realpath(sys.argv[0]))
         predictor = shape_predictor(scriptDir + os.path.sep + 'include' +os.path.sep +'data'+ os.path.sep + 'shape_predictor_68_face_landmarks.dat')
         #make a local copy of the image
         image = self._image.copy()
