@@ -149,12 +149,19 @@ def mark_picture(image, shape, circle_left, circle_right, points = None):
 
     #draw 68 landmark points
     aux=1
+    if shape[36,1]!=-1 and shape[39,1]!=-1:
+        size_landmarks = np.round(0.03*np.sqrt((shape[39,0]-shape[36,0])**2 + (shape[39,1]-shape[36,1])**2),0)
+        size_landmarks = int(size_landmarks)
+    else:
+        size_landmarks = np.round(0.03*np.sqrt((shape[42,0]-shape[45,0])**2 + (shape[42,1]-shape[45,1])**2),0)
+        size_landmarks = int(size_landmarks)        
+
     for (x,y) in shape:
         if x>0:
-            mark_size=int(w/180)
-            if mark_size>4: mark_size=4
-            cv2.circle(image, (x,y), mark_size , (0,0,255),-1)
-            cv2.putText(image, str(aux), (x-2,y-2), cv2.FONT_HERSHEY_SIMPLEX, 0.25, (0,0,0), 1)
+            #mark_size=int(w/180)
+            #if mark_size>4: mark_size=4
+            cv2.circle(image, (x,y), size_landmarks , (0,0,255),-1)
+            cv2.putText(image, str(aux), (x-2,y-2), cv2.FONT_HERSHEY_SIMPLEX, 0.1*size_landmarks, (0,0,0), 1)
             #           
         aux +=1
     
