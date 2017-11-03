@@ -173,6 +173,10 @@ class window(QtWidgets.QWidget):
         eyeAction = QtWidgets.QAction('Match iris diameter', self)
         eyeAction.setIcon(QtGui.QIcon(scriptDir + os.path.sep + 'include' +os.path.sep +'icon_color'+ os.path.sep + 'eye_icon.png'))
         eyeAction.triggered.connect(self.match_iris)
+
+        eyeLoad = QtWidgets.QAction('Load iris position and diameter', self)
+        eyeLoad.setIcon(QtGui.QIcon(scriptDir + os.path.sep + 'include' +os.path.sep +'icon_color'+ os.path.sep + 'eye_icon_import.png'))
+        eyeLoad.triggered.connect(self.load_iris)
         
         centerAction = QtWidgets.QAction('Find face center', self)
         centerAction.setIcon(QtGui.QIcon(scriptDir + os.path.sep + 'include' +os.path.sep +'icon_color'+ os.path.sep + 'center_icon.png'))
@@ -202,7 +206,7 @@ class window(QtWidgets.QWidget):
         #create the toolbar and add the actions 
         self.toolBar = QtWidgets.QToolBar(self)
         self.toolBar.addActions((loadAction, createPatientAction, self.changephotoAction, 
-                                 fitAction, eyeAction, centerAction, toggleAction,
+                                 fitAction, eyeAction, eyeLoad,centerAction, toggleAction,
                                  measuresAction, snapshotAction, saveAction,  exitAction))
         
         #set the size of each icon to 50x50
@@ -678,7 +682,35 @@ class window(QtWidgets.QWidget):
                         QtWidgets.QMessageBox.Ok, QtWidgets.QMessageBox.NoButton)
           
         self.displayImage.update_view()
+    
+    def load_iris(self):
+        #load a file using the widget
+        name,_ = QtWidgets.QFileDialog.getOpenFileName(
+                self,'Load Image',
+                '',"txt files (*.txt)")
+        
+        if not name:
+            pass
+        else:
+            #if windows then transform / to \ (python stuffs)
+            name = os.path.normpath(name)
+            self._file_name = name
+            #if the measurements window is open then close it
+            if self._new_window is not None:
+                self._new_window.close()
+
+            #if the photo was already processed then get the information for the
+            #txt file, otherwise process the photo using the landmark ans pupil
+            #localization algorithms 
+            file_txt=name[:-4]
+            file_txt = (file_txt + '.txt')
+            if os.path.isfile(file_txt):
+                _,lefteye,righteye,_ = get_info_from_txt(file_txt)
+                self.displayImage._lefteye = lefteye
+                self.displayImage._righteye = righteye 
+                self.displayImage.set_update_photo()
             
+        
             
     def toggle_landmarks(self):
         #Hide - show the landmarks 
