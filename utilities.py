@@ -142,9 +142,14 @@ def mark_picture(image, shape, circle_left, circle_right, points = None):
     
     #if requested, then draw a two lines to divide the face
     if points is not None:
-        cv2.line(image,points[0],points[1],(0,255,0),2)        
-        cv2.line(image,points[2],points[3],(0,255,0),2)
-        cv2.line(image,points[4],points[5],(0,255,0),2)
+        if h < 1000: #image is small, make lines of 2 pixel
+            cv2.line(image,points[0],points[1],(0,255,0),2)        
+            cv2.line(image,points[2],points[3],(0,255,0),2)
+            cv2.line(image,points[4],points[5],(0,255,0),2)
+        else:
+            cv2.line(image,points[0],points[1],(0,255,0),4)        
+            cv2.line(image,points[2],points[3],(0,255,0),4)
+            cv2.line(image,points[4],points[5],(0,255,0),4)            
 
 
     #draw 68 landmark points
@@ -167,10 +172,17 @@ def mark_picture(image, shape, circle_left, circle_right, points = None):
     
     #draw left iris
     if circle_left[2]>0:
-        cv2.circle(image, 
+        if h < 1000: #image is small, make circle of 1 pixel
+            cv2.circle(image, 
                tuple([int(circle_left[0]),
                int(circle_left[1])]),
                int(circle_left[2]),(0,255,0),1)
+        else:  #image is large, make circle of 2 pixel
+            cv2.circle(image, 
+               tuple([int(circle_left[0]),
+               int(circle_left[1])]),
+               int(circle_left[2]),(0,255,0),2)            
+    
         cv2.circle(image, 
                tuple([int(circle_left[0]),
                int(circle_left[1])]),
@@ -178,10 +190,16 @@ def mark_picture(image, shape, circle_left, circle_right, points = None):
     
     #draw right iris
     if circle_right[2]>0:
-        cv2.circle(image, 
+        if h < 1000: #image is small, make circle of 1 pixel
+            cv2.circle(image, 
                tuple([int(circle_right[0]),
                int(circle_right[1])]),
                int(circle_right[2]),(0,255,0),1)
+        else: #image is large, make circle of 2 pixel
+            cv2.circle(image, 
+               tuple([int(circle_right[0]),
+               int(circle_right[1])]),
+               int(circle_right[2]),(0,255,0),2)
         cv2.circle(image, 
                tuple([int(circle_right[0]),
                int(circle_right[1])]),

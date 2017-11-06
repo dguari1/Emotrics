@@ -40,6 +40,7 @@ class ImageViewer(QtWidgets.QGraphicsView):
         self.setBackgroundBrush(QtGui.QBrush(QtGui.QColor(100,100,100)))
         self.setFrameShape(QtWidgets.QFrame.NoFrame)
         self.setDragMode(QtWidgets.QGraphicsView.RubberBandDrag)
+        self.setMouseTracking(True)
         
         #this is used to show the dots and update the dots in image
         self._shape = None
@@ -53,6 +54,12 @@ class ImageViewer(QtWidgets.QGraphicsView):
         
         #this variable is used to verify is a landmark will be relocated
         self._IsPointLifted = False
+        
+        #this variable is used to verify if the user wants to drag the eyes to a different location
+        self._IsDragEyes = False
+        #and what eye is the person trying to move
+        self._IsDragLeft = False
+        self._IsDragRight = False
 
         #QtWidgets.QGraphicsView.RubberBandDrag
         
@@ -83,8 +90,7 @@ class ImageViewer(QtWidgets.QGraphicsView):
                      viewrect.height() / scenerect.height())               
             self.scale(factor, factor)
             self.centerOn(rect.center())
-            self._zoom = 0 
-                        
+            self._zoom = 0                        
             
     def zoomFactor(self):
         return self._zoom
@@ -129,10 +135,14 @@ class ImageViewer(QtWidgets.QGraphicsView):
                                         [self._lefteye[0],self._lefteye[1]]], axis=0)
                                         , mousePos)
                         distance=distance[:,0]
-                        #check is a landmark (including the eyes) is no more than 
-                        #3 pixels away from the click. If there is then lift that
-                        #landmark from the face                        
-                        PointToModify = [i for i, j in enumerate(distance) if j <=3 ]
+                        #check if a landmark (including the eyes) is no more than 
+                        #3 pixels away from the click location. If there is then lift that
+                        #landmark from the face. If the image is taller than 1000 pixels 
+                        #then the distance is 5 pixels
+                        if self._scene.height() < 1000:                           
+                            PointToModify = [i for i, j in enumerate(distance) if j <=3 ]
+                        else:
+                            PointToModify = [i for i, j in enumerate(distance) if j <=6 ]
                         if PointToModify:
                             self._PointToModify = PointToModify[0]
                             if self._PointToModify >= 68:
@@ -153,11 +163,11 @@ class ImageViewer(QtWidgets.QGraphicsView):
                             else:                            
                                 self._shape[self._PointToModify] = [-1,-1]
                                 self._IsPointLifted = True
-                            self.set_update_photo()
+                            #self.set_update_photo()
             elif event.button() == QtCore.Qt.LeftButton:
                 #if the user LeftClick and there is a landmark lifted, then 
                 #reposition the landmar in the position of the click 
-                self.setDragMode(QtWidgets.QGraphicsView.ScrollHandDrag)
+                
                 if self._IsPointLifted:
                     x_mousePos = scenePos.toPoint().x()
                     y_mousePos = scenePos.toPoint().y()
@@ -165,36 +175,164 @@ class ImageViewer(QtWidgets.QGraphicsView):
                     self._shape[self._PointToModify] = [x_mousePos, y_mousePos]
                     self._IsPointLifted = False
                     self._PointToModify = None
-                    self.set_update_photo()
+                    #self.set_update_photo()
+                else:
+                    #if the user is not going to replace a landmark then allow to pan around the image
+                    self.setDragMode(QtWidgets.QGraphicsView.ScrollHandDrag)
+                    
+                    #Now:
+                    #if the user leftclick and there is no landmark lifted, verify
+                    #if the user wants to modify the position of an eye
+                    if self._shape is not None:
+    
+                        x_mousePos = scenePos.toPoint().x()
+                        y_mousePos = scenePos.toPoint().y()
+                        mousePos=np.array([(x_mousePos, y_mousePos)])                   
+                        distance=cdist([[self._righteye[0],self._righteye[1]],
+                                        [self._lefteye[0],self._lefteye[1]]]
+                                        , mousePos)
+                        distance=distance[:,0]
+                        #check if a landmark (including the eyes) is no more than 
+                        #3 pixels away from the click location. If there is then lift that
+                        #landmark from the face. If the image is taller than 1000 pixels 
+                        #then the distance is 5 pixels
+                        if self._scene.height() < 1000:
+                            PointToModify = [i for i, j in enumerate(distance) if j <=3 ]
+                        else:
+                            PointToModify = [i for i, j in enumerate(distance) if j <=6 ]
+                            
+                        if PointToModify:
+                            self._PointToModify = PointToModify[0]
+                            if self._PointToModify == 0:
+                                #user wants to move the right eye, Both eyes have to move together 
+                                self._IsDragEyes = True
+                                self._IsDragLeft = False 
+                                self._IsDragRight = True 
+                            elif self._PointToModify == 1:
+                                #user wants to move the left eye, Both eyes have to move together 
+                                self._IsDragEyes = True
+                                self._IsDragRight = False 
+                                self._IsDragLeft = True 
+                                
+                            self.set_update_photo()                                
+                            #remove the Drag option
+                            self.setDragMode(QtWidgets.QGraphicsView.NoDrag)    
+                            #make the cursor a cross to facilitate localization of eye center     
+                            self.setCursor(QtGui.QCursor(QtCore.Qt.CrossCursor))
+                            
 
-             
             QtWidgets.QGraphicsView.mousePressEvent(self, event)
-     
+   
+    def mouseMoveEvent(self, event):
+        #this function takes care of the pan (move around the photo) and draggin of the eyes
+        
+        #if _IsDragEyes == true then the user wants to change the position of the eyes
+        if self.dragMode() == QtWidgets.QGraphicsView.NoDrag and self._IsDragEyes is True:
+            
+            for item in self._scene.items():
+                if isinstance(item, QtWidgets.QGraphicsEllipseItem):
+                    self._scene.removeItem(item)
+
+            scenePos = self.mapToScene(event.pos())
+            x_mousePos = scenePos.toPoint().x()
+            y_mousePos = scenePos.toPoint().y()
+            
+            if self._IsDragLeft: #the user wants to move the left eye 
+                #update the position of the left eye with the current mouse position 
+                self._lefteye = [x_mousePos, y_mousePos, self._lefteye[2]]
+                #self._lefteye = temp
+                #draw a circle 
+                self.draw_circle(self._lefteye)
+                event.accept()
+            
+            elif self._IsDragRight:
+                #update the position of the right eye with the current mouse position 
+                self._righteye = [x_mousePos, y_mousePos, self._righteye[2]]
+                #self._lefteye = temp
+                #draw a circle 
+                self.draw_circle(self._righteye)
+                event.accept()
+                
+            else:
+                event.ignore()
+            
+            #self.update()
+            
+
+        QtWidgets.QGraphicsView.mouseMoveEvent(self, event)
+            
+
+                
+    def mouseReleaseEvent(self, event):     
+        #this function defines what happens when you release the mouse click 
+        
+        #remove the Drag option
+        self.setDragMode(QtWidgets.QGraphicsView.NoDrag)
+        #return the cursor to an arrow (in case that it was changes to a cross)
+        self.setCursor(QtGui.QCursor(QtCore.Qt.ArrowCursor))
+        #remove the option to drag the eyes (if click was released then draggin is over)
+        self._IsDragEyes = False
+        self._IsDragLeft = False
+        self._IsDragRight = False
+        #update the viewer to present the latest postion of landmarks and iris
+        self.set_update_photo()
+        QtWidgets.QGraphicsView.mouseReleaseEvent(self, event)
+
+
+
+    def draw_circle(self, CircleInformation ):
+        #this function draws an circle with specific center and radius 
+        
+        Ellipse = QtWidgets.QGraphicsEllipseItem(0,0,CircleInformation[2]*2,CircleInformation[2]*2)
+        #ellipse will be green
+        pen = QtGui.QPen(QtCore.Qt.green)
+        #set the ellipse line width according to the image size
+        if self._scene.height() < 1000:
+            pen.setWidth(1)
+        else:
+            pen.setWidth(3)
+            
+        Ellipse.setPen(pen)      
+        #if I want to fill the ellipse i should do this:
+        #brush = QtGui.QBrush(QtCore.Qt.green) 
+        #Ellipse.setPen(brush)
+        
+        #this is the position of the top-left corner of the ellipse.......
+        Ellipse.setPos(CircleInformation[0]-CircleInformation[2],CircleInformation[1]-CircleInformation[2])
+        Ellipse.setTransform(QtGui.QTransform())        
+        self._scene.addItem(Ellipse)
+   
 
     def set_update_photo(self, toggle=True):
         #this function takes care of updating the view without re-setting the 
         #zoom. Is usefull for when you lift or relocate landmarks or when 
         #drawing lines in the middle of the face
-        self._scene.removeItem(self._photo)
-
-        temp_image  = self._opencvimage.copy()   
-        
-        if toggle: #verify if the user wants to remove the landmarks..
-            #if shape then draw 68 landmark points
-            if self._shape is not None:
-                #mark_picture takes care of drawing the landmarks and the circles
-                #in the iris using opencv 
-                temp_image = mark_picture(temp_image, self._shape, self._lefteye, self._righteye, self._points)
+        if self._opencvimage is not None:
+            self._scene.removeItem(self._photo)
             
-        image = cv2.cvtColor(temp_image,cv2.COLOR_BGR2RGB)
-        height, width, channel = image.shape
-        bytesPerLine = 3 * width
-        img_Qt = QtGui.QImage(image.data, width, height, bytesPerLine, QtGui.QImage.Format_RGB888)
-        img_show = QtGui.QPixmap.fromImage(img_Qt)
-        
-        self._photo.setPixmap(img_show)    
-        self._scene.addItem(self._photo)
-        self.setDragMode(QtWidgets.QGraphicsView.RubberBandDrag)
+            temp_image  = self._opencvimage.copy()   
+            
+            if toggle: #verify if the user wants to remove the landmarks..
+                #if shape then draw 68 landmark points
+                if self._shape is not None:
+                    #mark_picture takes care of drawing the landmarks and the circles
+                    #in the iris using opencv 
+                    if self._IsDragRight: #don't draw the right eye 
+                        temp_image = mark_picture(temp_image, self._shape, self._lefteye, [0,0,-1], self._points)
+                    elif self._IsDragLeft: #don't draw the left eye 
+                        temp_image = mark_picture(temp_image, self._shape, [0,0,-1], self._righteye, self._points)
+                    else: #draw both eyes
+                        temp_image = mark_picture(temp_image, self._shape, self._lefteye, self._righteye, self._points)
+                
+            image = cv2.cvtColor(temp_image,cv2.COLOR_BGR2RGB)
+            height, width, channel = image.shape
+            bytesPerLine = 3 * width
+            img_Qt = QtGui.QImage(image.data, width, height, bytesPerLine, QtGui.QImage.Format_RGB888)
+            img_show = QtGui.QPixmap.fromImage(img_Qt)
+            
+            self._photo.setPixmap(img_show)    
+            self._scene.addItem(self._photo)
+            self.setDragMode(QtWidgets.QGraphicsView.RubberBandDrag)
 
         
     def show_entire_image(self):
@@ -215,21 +353,22 @@ class ImageViewer(QtWidgets.QGraphicsView):
         
         
         #if shape then add shape to image
-        temp_image  = self._opencvimage.copy()
+        if self._opencvimage is not None:
+            temp_image  = self._opencvimage.copy()
+            
         
+            #draw 68 landmark points       
+            if self._shape is not None:
+               temp_image = mark_picture(temp_image, self._shape, self._lefteye, self._righteye, self._points)
     
-        #draw 68 landmark points       
-        if self._shape is not None:
-           temp_image = mark_picture(temp_image, self._shape, self._lefteye, self._righteye, self._points)
-
-        image = cv2.cvtColor(temp_image,cv2.COLOR_BGR2RGB)
-        height, width, channel = image.shape
-        bytesPerLine = 3 * width
-        img_Qt = QtGui.QImage(image.data, width, height, bytesPerLine, QtGui.QImage.Format_RGB888)
-        img_show = QtGui.QPixmap.fromImage(img_Qt)
-        
-        #show the photo
-        self.setPhoto(img_show)
+            image = cv2.cvtColor(temp_image,cv2.COLOR_BGR2RGB)
+            height, width, channel = image.shape
+            bytesPerLine = 3 * width
+            img_Qt = QtGui.QImage(image.data, width, height, bytesPerLine, QtGui.QImage.Format_RGB888)
+            img_show = QtGui.QPixmap.fromImage(img_Qt)
+            
+            #show the photo
+            self.setPhoto(img_show)
         
         
            
