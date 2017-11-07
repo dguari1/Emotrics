@@ -174,7 +174,7 @@ class window(QtWidgets.QWidget):
         eyeAction.setIcon(QtGui.QIcon(scriptDir + os.path.sep + 'include' +os.path.sep +'icon_color'+ os.path.sep + 'eye_icon.png'))
         eyeAction.triggered.connect(self.match_iris)
 
-        eyeLoad = QtWidgets.QAction('Load iris position and diameter', self)
+        eyeLoad = QtWidgets.QAction('Import iris position and diameter', self)
         eyeLoad.setIcon(QtGui.QIcon(scriptDir + os.path.sep + 'include' +os.path.sep +'icon_color'+ os.path.sep + 'eye_icon_import.png'))
         eyeLoad.triggered.connect(self.load_iris)
         
