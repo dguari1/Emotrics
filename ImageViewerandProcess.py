@@ -127,7 +127,7 @@ class ImageViewer(QtWidgets.QGraphicsView):
                 #if the user RightClick and no point is lifted then verify if 
                 #the position of the click is close to one of the landmarks
                 if self._IsPointLifted == False:
-                    if self._shape is not None:
+                    if self._shape is not None and not self._BothEyesTogether:
     
                         x_mousePos = scenePos.toPoint().x()
                         y_mousePos = scenePos.toPoint().y()
@@ -167,10 +167,20 @@ class ImageViewer(QtWidgets.QGraphicsView):
                                 self._shape[self._PointToModify] = [-1,-1]
                                 self._IsPointLifted = True
                             self.set_update_photo()
+                            
+                    elif self._BothEyesTogether: #the user was moving both eyes and now needs to finilize the moving action
+                        self.setCursor(QtGui.QCursor(QtCore.Qt.ArrowCursor))
+                        #remove the option to drag the eyes (if click was released then draggin is over)
+                        self._IsDragEyes = False
+                        self._IsDragLeft = False
+                        self._IsDragRight = False
+                        self._BothEyesTogether = False
+                        self.set_update_photo()  
+                    
             elif event.button() == QtCore.Qt.LeftButton:
+                                                
                 #if the user LeftClick and there is a landmark lifted, then 
-                #reposition the landmar in the position of the click 
-                
+                #reposition the landmar in the position of the click                 
                 if self._IsPointLifted:
                     x_mousePos = scenePos.toPoint().x()
                     y_mousePos = scenePos.toPoint().y()
@@ -179,13 +189,20 @@ class ImageViewer(QtWidgets.QGraphicsView):
                     self._IsPointLifted = False
                     self._PointToModify = None
                     #self.set_update_photo()
+                elif self._BothEyesTogether: #the user was moving both eyes and now needs to finilize the moving action
+                    self.setCursor(QtGui.QCursor(QtCore.Qt.ArrowCursor))
+                    #remove the option to drag the eyes (if click was released then draggin is over)
+                    self._IsDragEyes = False
+                    self._IsDragLeft = False
+                    self._IsDragRight = False
+                    self._BothEyesTogether = False
+                    self.set_update_photo()  
                 else:
-                    #if the user is not going to replace a landmark then allow to pan around the image
+                    #The user is probably goin to pan around, allow this 
                     self.setDragMode(QtWidgets.QGraphicsView.ScrollHandDrag)
                     
                     #Now:
-                    #if the user leftclick and there is no landmark lifted, verify
-                    #if the user wants to modify the position of an eye
+                    #verify if the user is actually trying to modify the eye position. This is done by clicking in the center of the eye
                     if self._shape is not None:
     
                         x_mousePos = scenePos.toPoint().x()
@@ -224,11 +241,37 @@ class ImageViewer(QtWidgets.QGraphicsView):
                             self.setDragMode(QtWidgets.QGraphicsView.NoDrag)    
                             #make the cursor a cross to facilitate localization of eye center     
                             self.setCursor(QtGui.QCursor(QtCore.Qt.CrossCursor))
+                            self.draw_circle(self._righteye)
+                            self.draw_circle(self._lefteye) 
                             
                             
             QtWidgets.QGraphicsView.mousePressEvent(self, event)
+            
+    def mouseReleaseEvent(self, event):     
+        #this function defines what happens when you release the mouse click 
+        
+        if not self._BothEyesTogether: #the user moved a single eye. This will only happen if the click is not realease
+            #remove the Drag option
+            self.setDragMode(QtWidgets.QGraphicsView.NoDrag)
+            #return the cursor to an arrow (in case that it was changes to a cross)
+            self.setCursor(QtGui.QCursor(QtCore.Qt.ArrowCursor))
+            #remove the option to drag the eyes (if click was released then draggin is over)
+            self._IsDragEyes = False
+            self._IsDragLeft = False
+            self._IsDragRight = False
+            self._BothEyesTogether = False
+            self.set_update_photo()
+            #update the viewer to present the latest postion of landmarks and iris
+        elif self._BothEyesTogether: #the user is moving both eyes together. The eyes will be moved until a new click is pressed
+            #remove the Drag option
+            self.setDragMode(QtWidgets.QGraphicsView.NoDrag)
+
+        QtWidgets.QGraphicsView.mouseReleaseEvent(self, event)
+
    
     def mouseDoubleClickEvent(self, event):
+   
+        #if the user double click on one of the iris the both iris will be able to move together
         if event.button() == QtCore.Qt.LeftButton:
             event.accept()
             if self._shape is not None:
@@ -264,16 +307,21 @@ class ImageViewer(QtWidgets.QGraphicsView):
                         self._IsDragRight = False 
                         self._IsDragLeft = True 
                         self._BothEyesTogether = True
-                                                
-                    self.set_update_photo()                                
+                    
+
+                    #remove the iris from the image                           
+                    self.set_update_photo()                             
                     #remove the Drag option
                     self.setDragMode(QtWidgets.QGraphicsView.NoDrag)    
                     #make the cursor a cross to facilitate localization of eye center     
                     self.setCursor(QtGui.QCursor(QtCore.Qt.CrossCursor))
-                    #print(self._BothEyesTogether)
+
+                    
         else:
             event.ignore()
             
+        self.draw_circle(self._righteye)
+        self.draw_circle(self._lefteye) 
         QtWidgets.QGraphicsView.mouseDoubleClickEvent(self, event)
                 
 
@@ -358,24 +406,6 @@ class ImageViewer(QtWidgets.QGraphicsView):
         QtWidgets.QGraphicsView.mouseMoveEvent(self, event)
             
 
-                
-    def mouseReleaseEvent(self, event):     
-        #this function defines what happens when you release the mouse click 
-        
-        #remove the Drag option
-        self.setDragMode(QtWidgets.QGraphicsView.NoDrag)
-        #return the cursor to an arrow (in case that it was changes to a cross)
-        self.setCursor(QtGui.QCursor(QtCore.Qt.ArrowCursor))
-        #remove the option to drag the eyes (if click was released then draggin is over)
-        self._IsDragEyes = False
-        self._IsDragLeft = False
-        self._IsDragRight = False
-        self._BothEyesTogether = False
-        #update the viewer to present the latest postion of landmarks and iris
-        self.set_update_photo()
-        QtWidgets.QGraphicsView.mouseReleaseEvent(self, event)
-
-
 
     def draw_circle(self, CircleInformation ):
         #this function draws an circle with specific center and radius 
@@ -414,12 +444,13 @@ class ImageViewer(QtWidgets.QGraphicsView):
                 if self._shape is not None:
                     #mark_picture takes care of drawing the landmarks and the circles
                     #in the iris using opencv 
-                    if self._IsDragRight and not self._BothEyesTogether: #don't draw the right eye 
-                        temp_image = mark_picture(temp_image, self._shape, self._lefteye, [0,0,-1], self._points)
-                    elif self._IsDragLeft and not self._BothEyesTogether: #don't draw the left eye 
-                        temp_image = mark_picture(temp_image, self._shape, [0,0,-1], self._righteye, self._points)                    
-                    elif self._BothEyesTogether: #don't draw the left eye 
-                        temp_image = mark_picture(temp_image, self._shape, [0,0,-1], [0,0,-1], self._points)        
+                    if self._IsDragEyes:
+                        if self._IsDragRight and not self._BothEyesTogether: #don't draw the right eye 
+                            temp_image = mark_picture(temp_image, self._shape, self._lefteye, [0,0,-1], self._points)
+                        elif self._IsDragLeft and not self._BothEyesTogether: #don't draw the left eye 
+                            temp_image = mark_picture(temp_image, self._shape, [0,0,-1], self._righteye, self._points)                    
+                        elif self._BothEyesTogether: #don't draw both eyes 
+                            temp_image = mark_picture(temp_image, self._shape, [0,0,-1], [0,0,-1], self._points)        
                     else: #draw both eyes
                         temp_image = mark_picture(temp_image, self._shape, self._lefteye, self._righteye, self._points)
                 
