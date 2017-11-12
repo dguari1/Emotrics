@@ -686,16 +686,15 @@ class window(QtWidgets.QWidget):
     def load_iris(self):
         #load a file using the widget
         name,_ = QtWidgets.QFileDialog.getOpenFileName(
-                self,'Load Image',
-                '',"txt files (*.txt)")
+                self,'Load Iris Position and Diameter',
+                '',"Image files (*.png *.jpg *.jpeg *.tif *.tiff *.PNG *.JPG *.JPEG *.TIF *.TIFF)")
         
         if not name:
             pass
         else:
             #if windows then transform / to \ (python stuffs)
             name = os.path.normpath(name)
-            self._file_name = name
-            #if the measurements window is open then close it
+            #if the measurements window is open then close it, the measures will be updated with the new eyes position
             if self._new_window is not None:
                 self._new_window.close()
 
@@ -705,10 +704,26 @@ class window(QtWidgets.QWidget):
             file_txt=name[:-4]
             file_txt = (file_txt + '.txt')
             if os.path.isfile(file_txt):
-                _,lefteye,righteye,_ = get_info_from_txt(file_txt)
-                self.displayImage._lefteye = lefteye
-                self.displayImage._righteye = righteye 
+                shape,lefteye,righteye,_ = get_info_from_txt(file_txt)
+                
+                dx_left = lefteye[0]-shape[27,0]
+                dy_left = shape[27,1]-lefteye[1]
+                
+                dx_right = shape[27,0]-righteye[0]
+                dy_right = shape[27,1]-righteye[1]
+                
+                self.displayImage._lefteye = [self.displayImage._shape[27,0]+dx_left, self.displayImage._shape[27,1]-dy_left,lefteye[2]]
+                self.displayImage._righteye = [self.displayImage._shape[27,0]-dx_right, self.displayImage._shape[27,1]-dy_right,lefteye[2]]
                 self.displayImage.set_update_photo()
+                
+            else:
+                QtWidgets.QMessageBox.warning(self,"Warning",
+                    "Iris information for this photograph is not avaliable",
+                        QtWidgets.QMessageBox.Ok, QtWidgets.QMessageBox.NoButton)
+                
+#                self.displayImage._lefteye = lefteye
+#                self.displayImage._righteye = righteye 
+#                self.displayImage.set_update_photo()
             
         
             
