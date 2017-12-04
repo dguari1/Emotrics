@@ -36,6 +36,8 @@ from utilities import save_xls_file_patient
 
 from ProcessLandmarks import GetLandmarks
 
+from save_window import SaveWindow
+
 
 
 """
@@ -763,6 +765,9 @@ class window(QtWidgets.QWidget):
                     save_txt_file(self._file_name, self.displayImage._shape, self.displayImage._lefteye, self.displayImage._righteye, self.displayImage._boundingbox)
                     MeasurementsLeft, MeasurementsRight, MeasurementsDeviation, MeasurementsPercentual = get_measurements_from_data(self.displayImage._shape, self.displayImage._lefteye, self.displayImage._righteye)
                     save_xls_file(self._file_name, MeasurementsLeft, MeasurementsRight, MeasurementsDeviation, MeasurementsPercentual)
+                    
+                    temp = SaveWindow(self, self._file_name)
+                    temp.exec_()
         else:#this implies that the user created a patient and wants to analize two photos
             save_txt_file(self._Patient.FirstPhoto._file_name, self._Patient.FirstPhoto._shape, self._Patient.FirstPhoto._lefteye, self._Patient.FirstPhoto._righteye,  self._Patient.FirstPhoto._boundingbox)    
             save_txt_file(self._Patient.SecondPhoto._file_name, self._Patient.SecondPhoto._shape, self._Patient.SecondPhoto._lefteye, self._Patient.SecondPhoto._righteye, self._Patient.SecondPhoto._boundingbox)

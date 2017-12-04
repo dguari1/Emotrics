@@ -30,7 +30,7 @@ class ProcessEye(QtWidgets.QDialog):
         if self._image is not None:
             self.view._image = self._image
             self.view.set_picture()
-        self.buttonReset = QtWidgets.QPushButton('Reset', self)
+        self.buttonReset = QtWidgets.QPushButton('Clear', self)
         self.buttonReset.clicked.connect(self.view.handleClearView)
         
         self.buttonDone = QtWidgets.QPushButton('Done',self)

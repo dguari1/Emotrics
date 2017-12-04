@@ -598,6 +598,9 @@ def save_xls_file(file_name, MeasurementsLeft, MeasurementsRight, MeasurementsDe
     df = pd.DataFrame(fill, index = Index, columns = Columns)
     df.columns = pd.MultiIndex.from_tuples(list(zip(Header,df.columns)))
     
+    df.insert(2, "Popo", 1)
+    df.head()
+    
     df.to_excel(file_no_ext+'.xls',index = True)
     
 
