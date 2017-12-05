@@ -5,6 +5,9 @@ Created on Sat Dec  2 10:33:30 2017
 @author: Diego L.Guarin -- diego_guarin at meei.harvard.edu
 """
 import os
+import numpy as np
+import pandas as pd
+from openpyxl import load_workbook
 from PyQt5 import QtWidgets
 from PyQt5 import QtGui
 from PyQt5 import QtCore
@@ -38,16 +41,12 @@ class MyLineEdit(QLineEdit):
 
         
 class SaveWindow(QDialog):
-    def __init__(self, parent=None, file_name = None):
+    def __init__(self, parent=None, file_name = None, MeasurementsLeft = None, MeasurementsRight = None, MeasurementsDeviation = None, MeasurementsPercentual = None):
         super(SaveWindow, self).__init__(parent)
         
-        self._Patient = None    #This variable defines if the user is 
-                                #trying to save results from a single photo  
-                                #or from a patient. If the user is trying to 
-                                #save results from a photo then it can select 
-                                #the file that the results will be saved to, 
-                                #if is saving a patient then this option is not 
-                                #avaliable
+        self._NewFile = True    #This variable defines if the user is 
+                                #trying to save results in a new file or to a
+                                #append results to an existing file
                                 
         self._name_of_file = file_name  #this variable stores the name of the 
                                         #file, it won't be modified during 
@@ -62,7 +61,12 @@ class SaveWindow(QDialog):
         photo_location = temp[0:-1]
         photo_location = delimiter.join(photo_location)
         photo_name=temp[-1]
-       
+        
+        #measurements
+        self._MeasurementsLeft = MeasurementsLeft
+        self._MeasurementsRight = MeasurementsRight
+        self._MeasurementsDeviation = MeasurementsDeviation
+        self._MeasurementsPercentual = MeasurementsPercentual
         
         self._file_name = photo_name  #path + file name
         self._photo_location = photo_location
@@ -191,7 +195,7 @@ class SaveWindow(QDialog):
         
         SaveButton = QPushButton('&Save', self)
         SaveButton.setFixedWidth(150)
-        SaveButton.clicked.connect(self.Done)
+        SaveButton.clicked.connect(self.Save)
         
         CancelButton = QPushButton('&Cancel', self)
         CancelButton.setFixedWidth(150)
@@ -228,9 +232,6 @@ class SaveWindow(QDialog):
         self.close()  
 
         
-    def Done(self):
-        self.close()
-        
     def SelectFolder(self):
         name = QtWidgets.QFileDialog.getExistingDirectory(self, 'Select directory')
         
@@ -248,10 +249,11 @@ class SaveWindow(QDialog):
                 temp=filename.split(delimiter)
                 photo_name=temp[-1]
                 self._file.setText(photo_name)
-                
+
             name = os.path.normpath(name)
             self._photo_location = name
-            self._SelectFolder.setText(self._photo_location) 
+            self._SelectFolder.setText(self._photo_location)                        
+            self._NewFile = True  #a new file will be created
             self.update()
         
     def SelectFile(self):
@@ -285,9 +287,150 @@ class SaveWindow(QDialog):
             
             self._file_to_save = name
             self._SelectFile.setText(self._file_to_save) 
+            self._NewFile = False  #data will be appended to an exisiting file
             self.update()
 
-       
+
+            
+    def Save(self):
+        
+        
+        number_of_measurements = 9
+        Columns = ['Right','Left','Deviation (absolute)','Deviation (percent)']
+        Columns = Columns * number_of_measurements
+        
+        Columns.insert(0,'')
+        Columns.insert(0,'')
+        Columns.insert(0,'')
+        Columns.insert(0,'')
+        
+        Columns.append('')
+        
+        
+        
+        temp = ['Brow Height', 'Marginal Reflex Distance 1', 'Marginal Reflex Distance 2', 
+                'Commisure Excursion', 'Commisure Height Deviation', 'Smile Angle',
+                'Upper Lip Height Deviation', 'Dental Show', 'Lower Lip Height Deviation']
+        number_of_repetitions=4
+        Header = [item for item in temp for i in range(number_of_repetitions)]
+        
+        
+        Header.insert(0,'Expression')
+        Header.insert(0,'Procedure')
+        Header.insert(0,'Pre vs Post Procedure')
+        Header.insert(0,'Unique Identifier')
+        
+        Header.append('Additional Comments')
+        
+        
+        
+        
+        #measurements
+        elements = ['BH', 'MRD1', 'MRD2', 'CE', 'CH', 'SA', 'UVH', 'DS', 'LVH']
+        
+        MeasurementsLeft = self._MeasurementsLeft
+        MeasurementsRight = self._MeasurementsRight
+        MeasurementsDeviation = self._MeasurementsDeviation
+        MeasurementsPercentual = self._MeasurementsPercentual
+
+        BH = np.array([[MeasurementsRight.BrowHeight,MeasurementsLeft.BrowHeight,MeasurementsDeviation.BrowHeight,MeasurementsPercentual.BrowHeight]],dtype=object)
+        #BH=np.array([[1,1,1,1]],dtype = object)
+        MRD1 = np.array([[MeasurementsRight.MarginalReflexDistance1, MeasurementsLeft.MarginalReflexDistance1,MeasurementsDeviation.MarginalReflexDistance1,MeasurementsPercentual.MarginalReflexDistance1]], dtype=object)
+        #MRD1=np.array([[1,1,1,1]],dtype = object)
+        MRD2 = np.array([[MeasurementsRight.MarginalReflexDistance2, MeasurementsLeft.MarginalReflexDistance2,MeasurementsDeviation.MarginalReflexDistance2,MeasurementsPercentual.MarginalReflexDistance2]],dtype=object)
+        #MRD2=np.array([[1,1,1,1]],dtype = object)
+        CE = np.array([[MeasurementsRight.CommissureExcursion, MeasurementsLeft.CommissureExcursion,MeasurementsDeviation.CommissureExcursion,MeasurementsPercentual.CommissureExcursion]],dtype=object)
+        #CE=np.array([[1,1,1,1]],dtype = object)
+        CH = np.array([['', '',MeasurementsDeviation.CommisureHeightDeviation,'']],dtype=object)
+        #CH=np.array([[1,1,1,1]],dtype = object)
+        SA = np.array([[MeasurementsRight.SmileAngle, MeasurementsLeft.SmileAngle,MeasurementsDeviation.SmileAngle,MeasurementsPercentual.SmileAngle]],dtype=object)
+        #SA=np.array([[1,1,1,1]],dtype = object)
+        UVH = np.array([['', '',MeasurementsDeviation.UpperLipHeightDeviation,'']],dtype=object)
+        #UVH=np.array([[1,1,1,1]],dtype = object)
+        DS = np.array([[MeasurementsRight.DentalShow, MeasurementsLeft.DentalShow,MeasurementsDeviation.DentalShow,MeasurementsPercentual.DentalShow]],dtype=object)
+        #DS=np.array([[1,1,1,1]],dtype = object)
+        LVH = np.array([['', '',MeasurementsDeviation.LowerLipHeightDeviation,'']],dtype=object)
+        #LVH=np.array([[1,1,1,1]],dtype = object)      
+        
+        
+        UI = np.array([[self._Identifier.text()]],dtype = object)
+        #UI = np.array([['uno']],dtype = object)
+        PvsP = np.array([[str(self._PrevsPost.currentText())]],dtype = object)
+        #PvsP = np.array([['dos']],dtype = object)
+        PC = np.array([[self._SurgeryType.text()]],dtype = object)
+        #PC = np.array([['tres']],dtype = object)
+        EX = np.array([[self._ExpressionType.text()]],dtype = object)
+        #EX = np.array([['cuatro']],dtype = object)
+        AD = np.array([[self._AddtitionalComments.text()]],dtype = object)
+        #AD = np.array([['cinco']],dtype = object)
+        
+
+        fill= UI
+        fill= np.append(fill, PvsP, axis = 1)
+        fill= np.append(fill, PC, axis = 1)
+        fill= np.append(fill, EX, axis = 1)
+        for i in elements:
+                fill = np.append(fill, eval(i), axis = 1)
+        
+        fill= np.append(fill, AD, axis = 1)
+        
+        
+
+
+        
+        if self._NewFile: #the user wants to create a new file
+                        
+            filename, file_extension = os.path.splitext(self._name_of_file ) 
+            delimiter = os.path.sep
+            temp=filename.split(delimiter)
+            photo_name=temp[-1] + file_extension
+            
+            
+            file_no_ext = os.path.join(str(self._SelectFolder.text()),str(self._file.text()))  
+            
+            
+            Index = [photo_name]
+        
+            df = pd.DataFrame(fill, index = Index, columns = Columns)
+            df.columns = pd.MultiIndex.from_tuples(list(zip(Header,df.columns)))
+            
+            writer = pd.ExcelWriter(file_no_ext+'.xlsx', engine='xlsxwriter')
+            
+            df.to_excel(writer, sheet_name='Sheet1', index = True)
+
+            #adjust the size of each column to fit the text
+            size_list = [15,20,20,20,20,10,10,18,18,10,10,18,18,10,10,18,18,10,10,18,18,10,10,18,18,10,10,18,18,10,10,18,18,10,10,18,18,10,10,18,18,20]
+            
+            worksheet = writer.sheets['Sheet1']
+            for k in range (0,42):
+                worksheet.set_column(k,k,size_list[k])
+
+            writer.save()
+            
+        else: #the user wants to appedn to an existing file
+            
+            
+            filename, file_extension = os.path.splitext(self._name_of_file ) 
+            delimiter = os.path.sep
+            temp=filename.split(delimiter)
+            photo_name=temp[-1] + file_extension
+            
+            Index = [photo_name]
+            
+            old_df = pd.read_excel(str(self._SelectFile.text()), sheetname=0)
+            old_df.columns = pd.MultiIndex.from_tuples(list(zip(Header,old_df.columns)))
+            
+            #df = pd.DataFrame(fill, index = Index)
+            #old_df.append(df)
+            
+            writer = pd.ExcelWriter(str(self._SelectFile.text()), engine='xlsxwriter')
+
+            old_df.to_excel(writer, sheet_name='Sheet1', index = True)
+            
+            
+            writer.save()
+            
+        self.close() 
       
 if __name__ == '__main__':
     app = QtWidgets.QApplication([])
