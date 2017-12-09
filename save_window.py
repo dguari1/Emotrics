@@ -390,10 +390,10 @@ class SaveWindow(QDialog):
             
             
             Index = [photo_name]
-        
+            #create data frame using data
             df = pd.DataFrame(fill, index = Index, columns = Columns)
             df.columns = pd.MultiIndex.from_tuples(list(zip(Header,df.columns)))
-            
+            #write data frame to an excel file 
             writer = pd.ExcelWriter(file_no_ext+'.xlsx', engine='xlsxwriter')
             
             df.to_excel(writer, sheet_name='Sheet1', index = True)
@@ -415,20 +415,35 @@ class SaveWindow(QDialog):
             temp=filename.split(delimiter)
             photo_name=temp[-1] + file_extension
             
+            #create data frame with new ata
             Index = [photo_name]
+            df = pd.DataFrame(fill, index = Index, columns = Columns)
+            df.columns = pd.MultiIndex.from_tuples(list(zip(Header,df.columns)))
             
-            old_df = pd.read_excel(str(self._SelectFile.text()), sheetname=0)
-            old_df.columns = pd.MultiIndex.from_tuples(list(zip(Header,old_df.columns)))
             
-            #df = pd.DataFrame(fill, index = Index)
-            #old_df.append(df)
+            #load data from file and arrange its columns to fit the template
+            old_df = pd.read_excel(str(self._SelectFile.text()), sheetname=0,header=[0, 1], index_col=0)
+            old_df.columns = pd.MultiIndex.from_tuples(df.columns)
             
+            #concatenate old and new data frame
+            Frames = [old_df, df]
+            
+            resuls = pd.concat(Frames, axis=0)
+            
+            #write results in selected file 
             writer = pd.ExcelWriter(str(self._SelectFile.text()), engine='xlsxwriter')
-
-            old_df.to_excel(writer, sheet_name='Sheet1', index = True)
+                        
+            resuls.to_excel(writer, sheet_name='Sheet1', index = True)
             
+            #adjust the size of each column to fit the text
+            size_list = [15,20,20,20,20,10,10,18,18,10,10,18,18,10,10,18,18,10,10,18,18,10,10,18,18,10,10,18,18,10,10,18,18,10,10,18,18,10,10,18,18,20]
+            
+            worksheet = writer.sheets['Sheet1']
+            for k in range (0,42):
+                worksheet.set_column(k,k,size_list[k])
             
             writer.save()
+            
             
         self.close() 
       
