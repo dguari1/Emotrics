@@ -406,6 +406,7 @@ class SaveWindow(QDialog):
                 worksheet.set_column(k,k,size_list[k])
 
             writer.save()
+            self.close() 
             
         else: #the user wants to appedn to an existing file
             
@@ -423,29 +424,39 @@ class SaveWindow(QDialog):
             
             #load data from file and arrange its columns to fit the template
             old_df = pd.read_excel(str(self._SelectFile.text()), sheetname=0,header=[0, 1], index_col=0)
-            old_df.columns = pd.MultiIndex.from_tuples(df.columns)
             
-            #concatenate old and new data frame
-            Frames = [old_df, df]
+            #verify if the loaded file is valid
+            if len(old_df.columns) is 41:
             
-            resuls = pd.concat(Frames, axis=0)
+                old_df.columns = pd.MultiIndex.from_tuples(df.columns)
             
-            #write results in selected file 
-            writer = pd.ExcelWriter(str(self._SelectFile.text()), engine='xlsxwriter')
-                        
-            resuls.to_excel(writer, sheet_name='Sheet1', index = True)
+                #concatenate old and new data frame
+                Frames = [old_df, df]
+                
+                resuls = pd.concat(Frames, axis=0)
+                
+                #write results in selected file 
+                writer = pd.ExcelWriter(str(self._SelectFile.text()), engine='xlsxwriter')
+                            
+                resuls.to_excel(writer, sheet_name='Sheet1', index = True)
+                
+                #adjust the size of each column to fit the text
+                size_list = [15,20,20,20,20,10,10,18,18,10,10,18,18,10,10,18,18,10,10,18,18,10,10,18,18,10,10,18,18,10,10,18,18,10,10,18,18,10,10,18,18,20]
+                
+                worksheet = writer.sheets['Sheet1']
+                for k in range (0,42):
+                    worksheet.set_column(k,k,size_list[k])
+                
+                writer.save()
+                self.close() 
+            else:
+                QtWidgets.QMessageBox.warning(self,"Warning",
+                    "Invalid File",
+                        QtWidgets.QMessageBox.Ok, QtWidgets.QMessageBox.NoButton)
+                
             
-            #adjust the size of each column to fit the text
-            size_list = [15,20,20,20,20,10,10,18,18,10,10,18,18,10,10,18,18,10,10,18,18,10,10,18,18,10,10,18,18,10,10,18,18,10,10,18,18,10,10,18,18,20]
             
-            worksheet = writer.sheets['Sheet1']
-            for k in range (0,42):
-                worksheet.set_column(k,k,size_list[k])
-            
-            writer.save()
-            
-            
-        self.close() 
+       
       
 if __name__ == '__main__':
     app = QtWidgets.QApplication([])
