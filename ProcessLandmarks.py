@@ -38,6 +38,7 @@ class GetLandmarks(QObject):
         detector = get_frontal_face_detector()
         scriptDir = os.path.dirname(os.path.realpath(sys.argv[0]))
         predictor = shape_predictor(scriptDir + os.path.sep + 'include' +os.path.sep +'data'+ os.path.sep + 'shape_predictor_68_face_landmarks.dat')
+        #predictor = shape_predictor('C:\\Users\\GUARIND\\Documents\\Python Scripts\\FaceLandmarkDataBase\\ibug_300W_large_face_landmark_dataset\\meei_68_face_landmarks.dat')
         #make a local copy of the image
         image = self._image.copy()
         height, width, d = image.shape                        
