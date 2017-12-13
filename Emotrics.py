@@ -31,12 +31,12 @@ from utilities import get_info_from_txt
 from utilities import mark_picture
 from utilities import save_snaptshot_to_file
 from utilities import save_txt_file
-from utilities import save_xls_file
 from utilities import save_xls_file_patient
 
 from ProcessLandmarks import GetLandmarks
 
 from save_window import SaveWindow
+from settings_window import ShowSettings
 
 
 
@@ -133,6 +133,12 @@ class window(QtWidgets.QWidget):
         
         # create Thread  to take care of the landmarks and iris estimation   
         self.thread_landmarks = QtCore.QThread()  # no parent!
+        
+        
+        self._CalibrationType = 'Iris'  #_CalibrationType can be 'Iris' or 'Manual'
+        self._CalibrationValue = 11.77 #calibration parameter
+        
+        self._ModelName = 'iBUG' #_ModelType can be 'iBUGS' or 'MEE'
       
         #initialize the User Interface
         self.initUI()
@@ -200,6 +206,10 @@ class window(QtWidgets.QWidget):
         snapshotAction.setIcon(QtGui.QIcon(scriptDir + os.path.sep + 'include' +os.path.sep +'icon_color'+ os.path.sep + 'snapshot_icon.png'))
         snapshotAction.triggered.connect(self.save_snapshot)
         
+        settingsAction = QtWidgets.QAction('Change Settings', self)
+        settingsAction.setIcon(QtGui.QIcon(scriptDir + os.path.sep + 'include' +os.path.sep +'icon_color'+ os.path.sep + 'settings-icon.png'))
+        settingsAction.triggered.connect(self.settings)
+        
         exitAction = QtWidgets.QAction('Exit', self)
         exitAction.setIcon(QtGui.QIcon(scriptDir + os.path.sep + 'include' +os.path.sep +'icon_color'+ os.path.sep + 'exit_icon.png'))
         exitAction.triggered.connect(self.close_app)
@@ -209,7 +219,8 @@ class window(QtWidgets.QWidget):
         self.toolBar = QtWidgets.QToolBar(self)
         self.toolBar.addActions((loadAction, createPatientAction, self.changephotoAction, 
                                  fitAction, eyeAction, eyeLoad,centerAction, toggleAction,
-                                 measuresAction, snapshotAction, saveAction,  exitAction))
+                                 measuresAction, snapshotAction, saveAction,  settingsAction, 
+                                 exitAction))
         
         #set the size of each icon to 50x50
         self.toolBar.setIconSize(QtCore.QSize(50,50))
@@ -631,7 +642,7 @@ class window(QtWidgets.QWidget):
 
                 #create worker, pass the image to the worker
                 #self.landmarks = GetLandmarks(self.displayImage._opencvimage)
-                self.landmarks = GetLandmarks(temp_image)
+                self.landmarks = GetLandmarks(temp_image, self._ModelName)
                 #move worker to new thread
                 self.landmarks.moveToThread(self.thread_landmarks)
                 #start the new thread where the landmark processing will be performed
@@ -774,7 +785,27 @@ class window(QtWidgets.QWidget):
             save_xls_file_patient(self._file_name,self._Patient)
 
             
-                
+    
+    def settings(self):
+        Settings = ShowSettings()
+        Settings.exec_()
+        
+        if Settings.tab1._checkBox1.isChecked() == True:
+            self._CalibrationType = 'Iris'
+            self._CalibrationValue = float(Settings.tab1._IrisDiameter_Edit.text())
+            print(self._CalibrationValue)
+        elif Settings.tab1._checkBox2.isChecked() == True:
+            self._CalibrationType = 'Manual'
+            self._CalibrationValue = float(Settings.tab1._Personalized_Edit.text())
+            print(self._CalibrationValue)   
+            
+        if Settings.tab2._checkBox1.isChecked() == True:
+            self._ModelName = 'iBUG'
+        elif Settings.tab2._checkBox2.isChecked() == True:
+            self._ModelName = 'MEE'
+            
+
+        
             
     def close_app(self):  
         

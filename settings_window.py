@@ -42,9 +42,9 @@ class CalibrationTab(QtWidgets.QWidget):
         
         
         #checkbox
-        self._checkBox1 = QtWidgets.QCheckBox('Personalized Value', self)
-        self._checkBox2 = QtWidgets.QCheckBox('Iris Diameter', self)
-        self._checkBox2.setChecked(True)
+        self._checkBox2 = QtWidgets.QCheckBox('Personalized Value', self)
+        self._checkBox1 = QtWidgets.QCheckBox('Iris Diameter', self)
+        self._checkBox1.setChecked(True)
         #self._checkBox3 = QtWidgets.QCheckBox('Subject and Camera Distance', self)
         
         
@@ -55,28 +55,91 @@ class CalibrationTab(QtWidgets.QWidget):
         
         self._Personalized_Edit = QtWidgets.QLineEdit(self)
         self._Personalized_Edit.setText("")
-        self._label1a = QtWidgets.QLabel('px/mm')
+        self._label2a = QtWidgets.QLabel('mm/px')
         
         
         self._IrisDiameter_Edit = QtWidgets.QLineEdit(self)
         self._IrisDiameter_Edit.setText("11.77")
-        self._label2a = QtWidgets.QLabel('mm')
+        self._label1a = QtWidgets.QLabel('mm')
         
 
         
         layout = QtWidgets.QGridLayout()
         
         layout.addWidget(self._checkBox1, 0,0,1,1)
-        layout.addWidget(self._Personalized_Edit, 1,0,1,1)
+        layout.addWidget(self._IrisDiameter_Edit, 1,0,1,1)
         layout.addWidget(self._label1a, 1,1,1,1)
         layout.addWidget(QHLine(),2,0)
         layout.addWidget(self._checkBox2, 3,0,1,1)
-        layout.addWidget(self._IrisDiameter_Edit, 4,0,1,1)
+        layout.addWidget(self._Personalized_Edit, 4,0,1,1)
         layout.addWidget(self._label2a, 4,1,1,1)
         
         self.setLayout(layout)
+        
 
-class ShowSettings(QtWidgets.QWidget):
+class ModelTab(QtWidgets.QWidget):
+    
+    def __init__(self):
+        super(ModelTab, self) .__init__()
+        
+        scriptDir = os.path.dirname(os.path.realpath(sys.argv[0]))
+        
+        #spacerh = QHLine()#QtWidgets.QWidget(self)
+        #spacerh.setFixedSize(10,0)
+        
+        #spacerv = QtWidgets.QWidget(self)
+        #spacerv.setFixedSize(0,10)
+        
+        self._tab_name = 'Model'
+        
+        
+        #checkbox
+        self._checkBox2 = QtWidgets.QCheckBox('iBUG Database', self)
+        self._checkBox1 = QtWidgets.QCheckBox('MEE Database', self)
+        self._checkBox1.setChecked(True)
+        #self._checkBox3 = QtWidgets.QCheckBox('Subject and Camera Distance', self)
+        
+        
+        self._CheckButtonGroup = QtWidgets.QButtonGroup(self)
+        self._CheckButtonGroup.addButton(self._checkBox1,1)
+        self._CheckButtonGroup.addButton(self._checkBox2,2)
+        #self._CheckButtonGroup.addButton(self._checkBox3,3)
+        
+        self._help_checkBox1 = QtWidgets.QPushButton('', self)
+        self._help_checkBox1.setIcon(QtGui.QIcon(scriptDir + os.path.sep + 'include' +os.path.sep +'icon_color'+ os.path.sep + 'question_icon.png'))
+        self._help_checkBox1.clicked.connect(lambda: self.push_help_checkBox1())
+        self._help_checkBox1.setIconSize(QtCore.QSize(20,20))
+        
+        
+        self._help_checkBox2 = QtWidgets.QPushButton('', self)
+        self._help_checkBox2.setIcon(QtGui.QIcon(scriptDir + os.path.sep + 'include' +os.path.sep +'icon_color'+ os.path.sep + 'question_icon.png'))
+        self._help_checkBox2.clicked.connect(lambda: self.push_help_checkBox2())
+        self._help_checkBox2.setIconSize(QtCore.QSize(20,20))
+        
+
+        
+        layout = QtWidgets.QGridLayout()
+        
+        layout.addWidget(self._checkBox1, 0,0)
+        layout.addWidget(self._help_checkBox1, 0,1)
+        layout.addWidget(QHLine(),1,0,1,2)
+        layout.addWidget(self._checkBox2, 2,0,1,1)
+        layout.addWidget(self._help_checkBox2, 2,1,1,1)
+        
+        self.setLayout(layout)
+        
+        
+    def push_help_checkBox1(self):
+        QtWidgets.QMessageBox.information(self, 'MEE Database', 
+                            'Database created using front face, standard clinical photographs from facial palsy patients', 
+                            QtWidgets.QMessageBox.Ok)
+              
+    def push_help_checkBox2(self):
+        QtWidgets.QMessageBox.information(self, 'iBUG Database', 
+                            'Database created as part of the iBUG project, it contains thousands of images taken in the wild along with face portaits obtained from the web', 
+                            QtWidgets.QMessageBox.Ok)        
+
+class ShowSettings(QtWidgets.QDialog):
     def __init__(self,parent=None):
         super(ShowSettings, self).__init__(parent)
         
@@ -85,10 +148,14 @@ class ShowSettings(QtWidgets.QWidget):
         self.setWindowIcon(QtGui.QIcon(scriptDir + os.path.sep + 'include' +os.path.sep +'icon_color'+ os.path.sep + 'settings_icon.ico'))
         
         self.tab1 = CalibrationTab()
+        self.tab2 = ModelTab()
         
         self.main_Widget = QtWidgets.QTabWidget(self)
         self.tab1.setAutoFillBackground(True)
+        self.tab2.setAutoFillBackground(True)
         self.main_Widget.addTab(self.tab1,self.tab1._tab_name)
+        self.main_Widget.addTab(self.tab2,self.tab2._tab_name)
+
         
         #if tab2 is not None:
         #    tab2.setAutoFillBackground(True)
@@ -126,7 +193,7 @@ class ShowSettings(QtWidgets.QWidget):
         self.close()
         
     def handleReturn(self):
-        if self.tab1._checkBox2.isChecked() == True:
+        if self.tab1._checkBox1.isChecked() == True:
             IrisDiameter = self.tab1._IrisDiameter_Edit.text()
             if not IrisDiameter:               
                 QtWidgets.QMessageBox.information(self, 'Error', 
@@ -139,10 +206,10 @@ class ShowSettings(QtWidgets.QWidget):
                             'The iris diameter must be larger than zero', 
                             QtWidgets.QMessageBox.Ok)
                 else:
-                    print(IrisDiameter)  
+                    self.close() 
             
             
-        elif self.tab1._checkBox1.isChecked() == True:
+        elif self.tab1._checkBox2.isChecked() == True:
             PersonalizedValue = self.tab1._Personalized_Edit.text()
             if not PersonalizedValue:
                 QtWidgets.QMessageBox.information(self, 'Error', 
@@ -155,7 +222,7 @@ class ShowSettings(QtWidgets.QWidget):
                             'The personalized calibration value must be larger than zero', 
                             QtWidgets.QMessageBox.Ok)
                 else:
-                    print(PersonalizedValue)
+                    self.close()
         
         
 if __name__ == '__main__':
@@ -164,5 +231,5 @@ if __name__ == '__main__':
     else:
         app = QtWidgets.QApplication.instance()
     GUI = ShowSettings()
-    GUI.show()
+    #GUI.show()
     app.exec_()

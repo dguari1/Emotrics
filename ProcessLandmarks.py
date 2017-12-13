@@ -22,9 +22,10 @@ class GetLandmarks(QObject):
     finished = pyqtSignal()
     landmarks = pyqtSignal(object, int, object, object, object)
     
-    def __init__(self, image):
+    def __init__(self, image, ModelName):
         super(GetLandmarks, self).__init__()
         self._image = image
+        self._ModelName  = ModelName
         self._shape = np.zeros((68,2),dtype=int)
         self._lefteye = [-1,-1,-1]
         self._righteye = [-1,-1,-1]
@@ -37,8 +38,11 @@ class GetLandmarks(QObject):
         #dlib algorithm 
         detector = get_frontal_face_detector()
         scriptDir = os.path.dirname(os.path.realpath(sys.argv[0]))
-        predictor = shape_predictor(scriptDir + os.path.sep + 'include' +os.path.sep +'data'+ os.path.sep + 'shape_predictor_68_face_landmarks.dat')
-        #predictor = shape_predictor('C:\\Users\\GUARIND\\Documents\\Python Scripts\\FaceLandmarkDataBase\\ibug_300W_large_face_landmark_dataset\\meei_68_face_landmarks.dat')
+        if self._ModelName == 'iBUG':  #user wants to use iBUGS model
+            predictor = shape_predictor(scriptDir + os.path.sep + 'include' +os.path.sep +'data'+ os.path.sep + 'shape_predictor_68_face_landmarks.dat')
+        else: #user wants to use MEE model
+            predictor = shape_predictor(scriptDir + os.path.sep + 'include' +os.path.sep +'data'+ os.path.sep + 'mee_shape_predictor_68_face_landmarks.dat')
+
         #make a local copy of the image
         image = self._image.copy()
         height, width, d = image.shape                        
