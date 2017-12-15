@@ -88,18 +88,22 @@ The toolbar includes actions for:
     image and a third one computing the variation in the metrics between both
     images. This is useful to compare pre and post-operative cases.
     
-    - Save results: Produces two files in the folder where the image is located. 
+    - Save results: Produces two files in the selected folder. 
     One text (.txt) file containing the landmarks information, and an excel (.xls)
     file containing the facial metrics. If the a patient is being processed (two
     images) then the excel file contains information about each image and the 
-    difference. The excel file will inherit the name of the image file or the 
-    patient ID depending on the mode.
+    difference. The excel file name will be the same as the photo file name but 
+    can be easily changed within the same manu. User can also chose to append 
+    results to an existing xls file.
     
     - Save current view: Saves the current view as png or jpg file. 
     
-    - Settings (not implemented yet): Allows for further customization of the 
+    - Settings: Allows for further customization of the 
     software. It facilitates the selection of scale (currently we assume that 
-    the iris diamater is 11.77mm), and the diameter and color of the landmaks
+    the iris diamater is 11.77mm), and the selection of the model used for 
+    landmark detection. Avaliable models:
+        - iBUG -> Trained with in the wild photos
+        - MEE -> trained with facial palsy patients photos
     
     - Exit: Exits the program 
 """
