@@ -29,8 +29,8 @@ class QVLine(QtWidgets.QFrame):
 
 class CalibrationTab(QtWidgets.QWidget):
     
-    def __init__(self):
-        super(CalibrationTab, self) .__init__()
+    def __init__(self,parent=None, CalibrationType = 'Iris', CalibrationValue = 11.77):
+        super(CalibrationTab, self) .__init__(parent)
         
         #spacerh = QHLine()#QtWidgets.QWidget(self)
         #spacerh.setFixedSize(10,0)
@@ -40,11 +40,14 @@ class CalibrationTab(QtWidgets.QWidget):
         
         self._tab_name = 'Calibration'
         
+        self._CalibrationType = CalibrationType
+        self._CalibratioValue = CalibrationValue
+        
         
         #checkbox
         self._checkBox2 = QtWidgets.QCheckBox('Personalized Value', self)
         self._checkBox1 = QtWidgets.QCheckBox('Iris Diameter', self)
-        self._checkBox1.setChecked(True)
+
         #self._checkBox3 = QtWidgets.QCheckBox('Subject and Camera Distance', self)
         
         
@@ -54,13 +57,25 @@ class CalibrationTab(QtWidgets.QWidget):
         #self._CheckButtonGroup.addButton(self._checkBox3,3)
         
         self._Personalized_Edit = QtWidgets.QLineEdit(self)
-        self._Personalized_Edit.setText("")
+        #self._Personalized_Edit.setText("")
         self._label2a = QtWidgets.QLabel('mm/px')
         
         
         self._IrisDiameter_Edit = QtWidgets.QLineEdit(self)
-        self._IrisDiameter_Edit.setText("11.77")
+        #self._IrisDiameter_Edit.setText("11.77")
         self._label1a = QtWidgets.QLabel('mm')
+        
+        
+        if self._CalibrationType == 'Iris':
+            self._checkBox1.setChecked(True)
+            self._checkBox2.setChecked(False)
+            self._Personalized_Edit.setText("")
+            self._IrisDiameter_Edit.setText(str(self._CalibratioValue))
+        else:
+            self._checkBox1.setChecked(False) 
+            self._checkBox2.setChecked(True)
+            self._Personalized_Edit.setText(str(self._CalibratioValue))
+            self._IrisDiameter_Edit.setText("")
         
 
         
@@ -79,8 +94,8 @@ class CalibrationTab(QtWidgets.QWidget):
 
 class ModelTab(QtWidgets.QWidget):
     
-    def __init__(self):
-        super(ModelTab, self) .__init__()
+    def __init__(self,parent=None, ModelName='iBUG'):
+        super(ModelTab, self) .__init__(parent)
         
         scriptDir = os.path.dirname(os.path.realpath(sys.argv[0]))
         
@@ -90,13 +105,20 @@ class ModelTab(QtWidgets.QWidget):
         #spacerv = QtWidgets.QWidget(self)
         #spacerv.setFixedSize(0,10)
         
+        self._ModelName=ModelName
+        
         self._tab_name = 'Model'
         
         
         #checkbox
         self._checkBox2 = QtWidgets.QCheckBox('iBUG Database', self)
         self._checkBox1 = QtWidgets.QCheckBox('MEE Database', self)
-        self._checkBox1.setChecked(True)
+        if self._ModelName == 'iBUG':
+            self._checkBox1.setChecked(False)
+            self._checkBox2.setChecked(True)
+        else:
+            self._checkBox1.setChecked(True) 
+            self._checkBox2.setChecked(False)
         #self._checkBox3 = QtWidgets.QCheckBox('Subject and Camera Distance', self)
         
         
@@ -140,15 +162,20 @@ class ModelTab(QtWidgets.QWidget):
                             QtWidgets.QMessageBox.Ok)        
 
 class ShowSettings(QtWidgets.QDialog):
-    def __init__(self,parent=None):
+    def __init__(self,parent=None, ModelName='iBUG', CalibrationType='Iris', CalibrationValue=11.77):
         super(ShowSettings, self).__init__(parent)
         
         self.setWindowTitle('Settings')
         scriptDir = os.path.dirname(os.path.realpath(sys.argv[0]))
         self.setWindowIcon(QtGui.QIcon(scriptDir + os.path.sep + 'include' +os.path.sep +'icon_color'+ os.path.sep + 'settings_icon.ico'))
         
-        self.tab1 = CalibrationTab()
-        self.tab2 = ModelTab()
+        
+        self._ModelName = ModelName
+        self._CalibrationType = CalibrationType
+        self._CalibrationValue = CalibrationValue
+        
+        self.tab1 = CalibrationTab(self, self._CalibrationType, self._CalibrationValue)
+        self.tab2 = ModelTab(self, self._ModelName)
         
         self.main_Widget = QtWidgets.QTabWidget(self)
         self.tab1.setAutoFillBackground(True)

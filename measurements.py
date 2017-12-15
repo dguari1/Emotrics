@@ -244,7 +244,7 @@ class FaceMeasurementsDeviation(object):
     
     
 
-def get_measurements_from_data(shape, left_pupil, right_pupil):
+def get_measurements_from_data(shape, left_pupil, right_pupil, CalibrationType, CalibrationValue):
     
     ResultsLeft = FaceMeasurementsSide()
     ResultsRight = FaceMeasurementsSide()
@@ -397,24 +397,34 @@ def get_measurements_from_data(shape, left_pupil, right_pupil):
     cross_brow_right=rotate_axis(np.column_stack((x1_brow_right,y1_brow_right)),rot_angle,np.array([right_pupil[0],right_pupil[1]]))
     _ , _ , ResultsRight.BrowHeight = mouth_measures(right_pupil[0:2], cross_brow_right, rot_angle)
     
+    
+    
+    
+    
     radius=(left_pupil[2]+right_pupil[2])/2
-    #assuming that the pupul diameter is 11.77mm we convert all the pixel measurements into millimeter measurements (this needs to be improves)
-    ResultsLeft.CommissureExcursion = ResultsLeft.CommissureExcursion*(11.77/(2*radius))
-    ResultsLeft.DentalShow = ResultsLeft.DentalShow*(11.77/(2*radius))
-    ResultsLeft.MarginalReflexDistance1 = ResultsLeft.MarginalReflexDistance1*(11.77/(2*radius))
-    ResultsLeft.MarginalReflexDistance2 = ResultsLeft.MarginalReflexDistance2*(11.77/(2*radius))
-    ResultsLeft.BrowHeight = ResultsLeft.BrowHeight*(11.77/(2*radius))
+    if CalibrationType == 'Iris': #Iris radius will be used as calibration
+        Calibration = CalibrationValue/(2*radius)
+    else:  #user provided calibration radius 
+        Calibration = CalibrationValue
     
     
-    ResultsRight.CommissureExcursion = ResultsRight.CommissureExcursion*(11.77/(2*radius))
-    ResultsRight.DentalShow = ResultsRight.DentalShow*(11.77/(2*radius))
-    ResultsRight.MarginalReflexDistance1 = ResultsRight.MarginalReflexDistance1*(11.77/(2*radius))
-    ResultsRight.MarginalReflexDistance2 = ResultsRight.MarginalReflexDistance2*(11.77/(2*radius))
-    ResultsRight.BrowHeight = ResultsRight.BrowHeight*(11.77/(2*radius))
     
-    ResultsDeviation.CommisureHeightDeviation = ResultsDeviation.CommisureHeightDeviation*(11.77/(2*radius))
-    ResultsDeviation.UpperLipHeightDeviation = ResultsDeviation.UpperLipHeightDeviation*(11.77/(2*radius))
-    ResultsDeviation.LowerLipHeightDeviation = ResultsDeviation.LowerLipHeightDeviation*(11.77/(2*radius))
+    ResultsLeft.CommissureExcursion = ResultsLeft.CommissureExcursion*Calibration
+    ResultsLeft.DentalShow = ResultsLeft.DentalShow*Calibration
+    ResultsLeft.MarginalReflexDistance1 = ResultsLeft.MarginalReflexDistance1*Calibration
+    ResultsLeft.MarginalReflexDistance2 = ResultsLeft.MarginalReflexDistance2*Calibration
+    ResultsLeft.BrowHeight = ResultsLeft.BrowHeight*Calibration
+    
+    
+    ResultsRight.CommissureExcursion = ResultsRight.CommissureExcursion*Calibration
+    ResultsRight.DentalShow = ResultsRight.DentalShow*Calibration
+    ResultsRight.MarginalReflexDistance1 = ResultsRight.MarginalReflexDistance1*Calibration
+    ResultsRight.MarginalReflexDistance2 = ResultsRight.MarginalReflexDistance2*Calibration
+    ResultsRight.BrowHeight = ResultsRight.BrowHeight*Calibration
+    
+    ResultsDeviation.CommisureHeightDeviation = ResultsDeviation.CommisureHeightDeviation*Calibration
+    ResultsDeviation.UpperLipHeightDeviation = ResultsDeviation.UpperLipHeightDeviation*Calibration
+    ResultsDeviation.LowerLipHeightDeviation = ResultsDeviation.LowerLipHeightDeviation*Calibration
     
     
     ResultsDeviation.CommissureExcursion = abs(ResultsLeft.CommissureExcursion-ResultsRight.CommissureExcursion)

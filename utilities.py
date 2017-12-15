@@ -602,7 +602,7 @@ def save_xls_file(file_name, MeasurementsLeft, MeasurementsRight, MeasurementsDe
     df.to_excel(file_no_ext+'.xlsx',index = True)
     
 
-def save_xls_file_patient(path,Patient):
+def save_xls_file_patient(path,Patient,CalibrationType,CalibrationValue):
     #saves the facial metrics into a xls file. It works only for a patient (two photos)
     
     
@@ -618,7 +618,7 @@ def save_xls_file_patient(path,Patient):
     
     elements = ['BH', 'MRD1', 'MRD2', 'CE', 'CH', 'SA', 'UVH', 'DS', 'LVH']
     #first photo
-    MeasurementsLeftFirst, MeasurementsRightFirst, MeasurementsDeviation, MeasurementsPercentual = get_measurements_from_data(Patient.FirstPhoto._shape,Patient.FirstPhoto._lefteye,Patient.FirstPhoto._righteye)
+    MeasurementsLeftFirst, MeasurementsRightFirst, MeasurementsDeviation, MeasurementsPercentual = get_measurements_from_data(Patient.FirstPhoto._shape,Patient.FirstPhoto._lefteye,Patient.FirstPhoto._righteye,CalibrationType,CalibrationValue)
     
     BH = np.array([[MeasurementsRightFirst.BrowHeight,MeasurementsLeftFirst.BrowHeight,MeasurementsDeviation.BrowHeight,MeasurementsPercentual.BrowHeight]],dtype=object)
     MRD1 = np.array([[MeasurementsRightFirst.MarginalReflexDistance1, MeasurementsLeftFirst.MarginalReflexDistance1,MeasurementsDeviation.MarginalReflexDistance1,MeasurementsPercentual.MarginalReflexDistance1]], dtype=object)
@@ -636,7 +636,7 @@ def save_xls_file_patient(path,Patient):
             fillFirst = np.append(fillFirst, eval(i), axis = 1)
             
     #Second photo
-    MeasurementsLeftSecond, MeasurementsRightSecond, MeasurementsDeviation, MeasurementsPercentual = get_measurements_from_data(Patient.SecondPhoto._shape,Patient.SecondPhoto._lefteye,Patient.SecondPhoto._righteye)
+    MeasurementsLeftSecond, MeasurementsRightSecond, MeasurementsDeviation, MeasurementsPercentual = get_measurements_from_data(Patient.SecondPhoto._shape,Patient.SecondPhoto._lefteye,Patient.SecondPhoto._righteye,CalibrationType,CalibrationValue)
     
     BH = np.array([[MeasurementsRightSecond.BrowHeight,MeasurementsLeftSecond.BrowHeight,MeasurementsDeviation.BrowHeight,MeasurementsPercentual.BrowHeight]],dtype=object)
     MRD1 = np.array([[MeasurementsRightSecond.MarginalReflexDistance1, MeasurementsLeftSecond.MarginalReflexDistance1,MeasurementsDeviation.MarginalReflexDistance1,MeasurementsPercentual.MarginalReflexDistance1]], dtype=object)

@@ -331,7 +331,7 @@ class window(QtWidgets.QWidget):
                     self._new_window = None
                 
                 #compute the facial metrics using the landmarks 
-                MeasurementsLeft, MeasurementsRight, MeasurementsDeviation, MeasurementsPercentual = get_measurements_from_data(self.displayImage._shape, self.displayImage._lefteye, self.displayImage._righteye)
+                MeasurementsLeft, MeasurementsRight, MeasurementsDeviation, MeasurementsPercentual = get_measurements_from_data(self.displayImage._shape, self.displayImage._lefteye, self.displayImage._righteye, self._CalibrationType, self._CalibrationValue)
                 
                 #send all the information the the appropiate places in the window 
                 self._tab1_results  =  CustomTabResult()
@@ -394,7 +394,7 @@ class window(QtWidgets.QWidget):
                     
                     
                 #compute the facial metrics for the first photo and fill the information 
-                MeasurementsLeftFirst, MeasurementsRightFirst, MeasurementsDeviation, MeasurementsPercentual = get_measurements_from_data(self._Patient.FirstPhoto._shape, self._Patient.FirstPhoto._lefteye, self._Patient.FirstPhoto._righteye)
+                MeasurementsLeftFirst, MeasurementsRightFirst, MeasurementsDeviation, MeasurementsPercentual = get_measurements_from_data(self._Patient.FirstPhoto._shape, self._Patient.FirstPhoto._lefteye, self._Patient.FirstPhoto._righteye, self._CalibrationType, self._CalibrationValue)
                 
                 self._tab1_results  =  CustomTabResult()
                 
@@ -438,7 +438,7 @@ class window(QtWidgets.QWidget):
                 
                 
                 #compute the facial metrics for the second photo and fill the information 
-                MeasurementsLeftSecond, MeasurementsRightSecond, MeasurementsDeviation, MeasurementsPercentual = get_measurements_from_data(self._Patient.SecondPhoto._shape, self._Patient.SecondPhoto._lefteye, self._Patient.SecondPhoto._righteye)
+                MeasurementsLeftSecond, MeasurementsRightSecond, MeasurementsDeviation, MeasurementsPercentual = get_measurements_from_data(self._Patient.SecondPhoto._shape, self._Patient.SecondPhoto._lefteye, self._Patient.SecondPhoto._righteye, self._CalibrationType, self._CalibrationValue)
                 
                 self._tab2_results  =  CustomTabResult()
                 
@@ -774,7 +774,7 @@ class window(QtWidgets.QWidget):
             if self._file_name is not None:
                 if self.displayImage._shape is not None:
                     save_txt_file(self._file_name, self.displayImage._shape, self.displayImage._lefteye, self.displayImage._righteye, self.displayImage._boundingbox)
-                    MeasurementsLeft, MeasurementsRight, MeasurementsDeviation, MeasurementsPercentual = get_measurements_from_data(self.displayImage._shape, self.displayImage._lefteye, self.displayImage._righteye)
+                    MeasurementsLeft, MeasurementsRight, MeasurementsDeviation, MeasurementsPercentual = get_measurements_from_data(self.displayImage._shape, self.displayImage._lefteye, self.displayImage._righteye, self._CalibrationType, self._CalibrationValue)
 #                    save_xls_file(self._file_name, MeasurementsLeft, MeasurementsRight, MeasurementsDeviation, MeasurementsPercentual)
 #                    
                     temp = SaveWindow(self, self._file_name, MeasurementsLeft, MeasurementsRight, MeasurementsDeviation, MeasurementsPercentual)
@@ -782,26 +782,29 @@ class window(QtWidgets.QWidget):
         else:#this implies that the user created a patient and wants to analize two photos
             save_txt_file(self._Patient.FirstPhoto._file_name, self._Patient.FirstPhoto._shape, self._Patient.FirstPhoto._lefteye, self._Patient.FirstPhoto._righteye,  self._Patient.FirstPhoto._boundingbox)    
             save_txt_file(self._Patient.SecondPhoto._file_name, self._Patient.SecondPhoto._shape, self._Patient.SecondPhoto._lefteye, self._Patient.SecondPhoto._righteye, self._Patient.SecondPhoto._boundingbox)
-            save_xls_file_patient(self._file_name,self._Patient)
+            save_xls_file_patient(self._file_name,self._Patient, self._CalibrationType, self._CalibrationValue)
 
             
     
     def settings(self):
-        Settings = ShowSettings()
+        #this new window allows the user to:
+            #1) modify the calibration parameter used to compute all the real-life measurements 
+            #2) Select the model used for landmakr estimation
+        #we send the current values to the window so that the values can be preserved when a new photo is loaded
+        Settings = ShowSettings(self, self._ModelName, self._CalibrationType, self._CalibrationValue)
         Settings.exec_()
         
+        #get values from the window and update appropiate parameters 
         if Settings.tab1._checkBox1.isChecked() == True:
             self._CalibrationType = 'Iris'
             self._CalibrationValue = float(Settings.tab1._IrisDiameter_Edit.text())
-            print(self._CalibrationValue)
         elif Settings.tab1._checkBox2.isChecked() == True:
             self._CalibrationType = 'Manual'
             self._CalibrationValue = float(Settings.tab1._Personalized_Edit.text())
-            print(self._CalibrationValue)   
             
-        if Settings.tab2._checkBox1.isChecked() == True:
+        if Settings.tab2._checkBox2.isChecked() == True:
             self._ModelName = 'iBUG'
-        elif Settings.tab2._checkBox2.isChecked() == True:
+        elif Settings.tab2._checkBox1.isChecked() == True:
             self._ModelName = 'MEE'
             
 

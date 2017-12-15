@@ -97,6 +97,7 @@ class View(QtWidgets.QGraphicsView):
         
         
     def mousePressEvent(self,event):
+        
         if self._counter < 4:
             scenePos = self.mapToScene(event.pos())
             x = scenePos.x()
@@ -104,7 +105,7 @@ class View(QtWidgets.QGraphicsView):
             self._mouse_pos = np.concatenate((self._mouse_pos, [[float(x),float(y)]]), axis=0)
             pen = QtGui.QPen(QtCore.Qt.red)
             brush = QtGui.QBrush(QtCore.Qt.red)
-            Rec= QtCore.QRectF(x, y,2,2)
+            Rec= QtCore.QRectF(x, y,int(self._scene.width()*(1/100)+1),int(self._scene.width()*(1/100)+1))
             self._scene.addEllipse(Rec, pen, brush)
         
         QtWidgets.QGraphicsView.mousePressEvent(self, event)
