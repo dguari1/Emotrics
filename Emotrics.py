@@ -261,7 +261,7 @@ class window(QtWidgets.QWidget):
         #if self._Patient is not None:
         #    self._Patient = None
             
-        temp = CreatePatient(self)
+        temp = CreatePatient(self, self._ModelName)
         temp.exec_()  #this action replaces temp.show()
         #in this care the program will stop until the window created by 
         #CreatePatient is closed, and this window can only be closed if two 

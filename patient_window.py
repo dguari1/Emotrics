@@ -63,8 +63,9 @@ class MyLineEdit(QLineEdit):
         self.clear()   
 
         
-class CreatePatient(QDialog):
-    def __init__(self, parent=None):
+class CreatePatient(QtWidgets.QDialog):
+    
+    def __init__(self, parent=None, ModelName='iBUG'):
         super(CreatePatient, self).__init__(parent)
         
         self._Patient = None    #This variable is the final output of this 
@@ -83,6 +84,9 @@ class CreatePatient(QDialog):
                                 #however, if the subject presses 'Done' and all
                                 #the conditions are fullfiled then 
                                 #_ExitFlag = True
+                                
+        self._ModelName  = ModelName #model that will be used for landmark 
+                                     #localization
                                 
                                 
         #the estimation of landmarks and iris radius will be performed in a 
@@ -370,7 +374,7 @@ class CreatePatient(QDialog):
                 
                 #create worker, pass the image to the worker
                 ##self.landmarks = GetLandmarks(self._Photo)
-                self.landmarks = GetLandmarks(temp_image)
+                self.landmarks = GetLandmarks(temp_image, self._ModelName)
                 #move worker to new thread
                 self.landmarks.moveToThread(self.thread_landmarks)
                 #start the new thread where the landmark processing will be performed
