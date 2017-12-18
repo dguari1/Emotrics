@@ -300,7 +300,15 @@ class window(QtWidgets.QWidget):
         #button to navigate between those two photos
         if self._file_name == self._Patient.FirstPhoto._file_name:
             #the first photo is on memory and we wnat to move to the second photo.
-            #just update the displayImage object with the second photo info 
+            
+            #first update the information from the screen to the memory on the
+            #first photo
+            self._Patient.FirstPhoto._lefteye = self.displayImage._lefteye
+            self._Patient.FirstPhoto._righteye = self.displayImage._righteye
+            self._Patient.FirstPhoto._shape =  self.displayImage._shape
+            self._Patient.FirstPhoto._points = self.displayImage._points
+            
+            #now update the displayImage object with the second photo info 
             self._file_name = self._Patient.SecondPhoto._file_name
             self.displayImage._opencvimage = self._Patient.SecondPhoto._photo
             self.displayImage._lefteye = self._Patient.SecondPhoto._lefteye 
@@ -310,6 +318,13 @@ class window(QtWidgets.QWidget):
             
         elif self._file_name == self._Patient.SecondPhoto._file_name:
             #the second photo is on memory and we wnat to move to the first photo
+            #first update the information from the screen to the memory on the
+            #second photo
+            self._Patient.SecondPhoto._lefteye = self.displayImage._lefteye
+            self._Patient.SecondPhoto._righteye = self.displayImage._righteye
+            self._Patient.SecondPhoto._shape =  self.displayImage._shape
+            self._Patient.SecondPhoto._points = self.displayImage._points
+            
             #just update the displayImage object with the First photo info
             self._file_name = self._Patient.FirstPhoto._file_name
             self.displayImage._opencvimage = self._Patient.FirstPhoto._photo
@@ -784,6 +799,29 @@ class window(QtWidgets.QWidget):
                     temp = SaveWindow(self, self._file_name, MeasurementsLeft, MeasurementsRight, MeasurementsDeviation, MeasurementsPercentual)
                     temp.exec_()
         else:#this implies that the user created a patient and wants to analize two photos
+            #get the current info from screen and update the memory
+            if self._file_name == self._Patient.FirstPhoto._file_name:
+                #the first photo is on memory and we wnat to move to the second photo.
+                
+                #first update the information from the screen to the memory on the
+                #first photo
+                self._Patient.FirstPhoto._lefteye = self.displayImage._lefteye
+                self._Patient.FirstPhoto._righteye = self.displayImage._righteye
+                self._Patient.FirstPhoto._shape =  self.displayImage._shape
+                self._Patient.FirstPhoto._points = self.displayImage._points
+                
+            
+            elif self._file_name == self._Patient.SecondPhoto._file_name:
+                #the second photo is on memory and we wnat to move to the first photo
+                #first update the information from the screen to the memory on the
+                #second photo
+                self._Patient.SecondPhoto._lefteye = self.displayImage._lefteye
+                self._Patient.SecondPhoto._righteye = self.displayImage._righteye
+                self._Patient.SecondPhoto._shape =  self.displayImage._shape
+                self._Patient.SecondPhoto._points = self.displayImage._points
+
+        
+            #now save results 
             save_txt_file(self._Patient.FirstPhoto._file_name, self._Patient.FirstPhoto._shape, self._Patient.FirstPhoto._lefteye, self._Patient.FirstPhoto._righteye,  self._Patient.FirstPhoto._boundingbox)    
             save_txt_file(self._Patient.SecondPhoto._file_name, self._Patient.SecondPhoto._shape, self._Patient.SecondPhoto._lefteye, self._Patient.SecondPhoto._righteye, self._Patient.SecondPhoto._boundingbox)
             save_xls_file_patient(self._file_name,self._Patient, self._CalibrationType, self._CalibrationValue)

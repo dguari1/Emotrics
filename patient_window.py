@@ -63,7 +63,7 @@ class MyLineEdit(QLineEdit):
         self.clear()   
 
         
-class CreatePatient(QtWidgets.QDialog):
+class CreatePatient(QDialog):
     
     def __init__(self, parent=None, ModelName='iBUG'):
         super(CreatePatient, self).__init__(parent)
