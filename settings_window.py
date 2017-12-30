@@ -112,7 +112,7 @@ class ModelTab(QtWidgets.QWidget):
         
         #checkbox
         self._checkBox2 = QtWidgets.QCheckBox('iBUG Database', self)
-        self._checkBox1 = QtWidgets.QCheckBox('MEE Database', self)
+        self._checkBox1 = QtWidgets.QCheckBox('MEEI Database', self)
         if self._ModelName == 'iBUG':
             self._checkBox1.setChecked(False)
             self._checkBox2.setChecked(True)
@@ -152,7 +152,7 @@ class ModelTab(QtWidgets.QWidget):
         
         
     def push_help_checkBox1(self):
-        QtWidgets.QMessageBox.information(self, 'MEE Database', 
+        QtWidgets.QMessageBox.information(self, 'MEEI Database', 
                             'Database created using front face, standard clinical photographs from facial palsy patients', 
                             QtWidgets.QMessageBox.Ok)
               

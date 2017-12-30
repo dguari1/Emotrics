@@ -30,7 +30,7 @@ class ShowResults(QtWidgets.QMainWindow):
         
         self._label0a = QtWidgets.QLabel('Right')
         self._label0b = QtWidgets.QLabel('Left')
-        self._label0c = QtWidgets.QLabel('Deviation')
+        self._label0c = QtWidgets.QLabel('Difference')
         
         self._CE = QtWidgets.QLabel('Commisure excursion:')
         self._SA = QtWidgets.QLabel('Smile angle:')
