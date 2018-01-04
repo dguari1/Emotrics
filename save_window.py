@@ -83,7 +83,7 @@ class SaveWindow(QDialog):
     def initUI(self):
         
         self.setWindowTitle('Save')
-        scriptDir = os.path.dirname(os.path.realpath(__file__))
+        scriptDir = os.getcwd()#os.path.dirname(os.path.realpath(__file__))
         self.setWindowIcon(QtGui.QIcon(scriptDir + os.path.sep + 'include' +os.path.sep +'icon_color'+ os.path.sep + 'save_icon.ico'))
         
         self.main_Widget = QtWidgets.QWidget(self)

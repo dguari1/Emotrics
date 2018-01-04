@@ -32,7 +32,7 @@ class ShowExample(QtWidgets.QMainWindow):
 
         
         
-        scriptDir = os.path.dirname(os.path.realpath(sys.argv[0]))
+        scriptDir = os.getcwd()#os.path.dirname(os.path.realpath(sys.argv[0]))
         img_Qt = QtGui.QImage(scriptDir + os.path.sep + 'include' +os.path.sep +'icons'+ os.path.sep + 'Facial-Nerve-Center.jpg')
         pixmap = QtGui.QPixmap.fromImage(img_Qt)
         self._view_photo = ImageViewer()

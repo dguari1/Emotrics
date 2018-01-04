@@ -115,7 +115,7 @@ class window(QtWidgets.QWidget):
         super(window, self).__init__()
         #self.setGeometry(5,60,700,500)
         self.setWindowTitle('Emotrics')
-        scriptDir = os.path.dirname(os.path.realpath(sys.argv[0]))
+        scriptDir = os.getcwd()#os.path.dirname(os.path.realpath(sys.argv[0]))
         self.setWindowIcon(QtGui.QIcon(scriptDir + os.path.sep + 'include' +os.path.sep +'icon_color'+ os.path.sep + 'meei_3WR_icon.ico'))
         
         self._new_window = None
@@ -149,7 +149,7 @@ class window(QtWidgets.QWidget):
         
     def initUI(self):
         #local directory
-        scriptDir = os.path.dirname(os.path.realpath(sys.argv[0]))
+        scriptDir = os.getcwd()#os.path.dirname(os.path.realpath(sys.argv[0]))
 
         #image
         #read the image from file        
@@ -411,6 +411,26 @@ class window(QtWidgets.QWidget):
                     self._new_window.close()
                     self._new_window = None
                     
+                 
+                 #update the information from the display to memory    
+                if self._file_name == self._Patient.FirstPhoto._file_name:
+                    #the first photo is being displayed, update the information 
+                    #from the screen to the memory 
+                    self._Patient.FirstPhoto._lefteye = self.displayImage._lefteye
+                    self._Patient.FirstPhoto._righteye = self.displayImage._righteye
+                    self._Patient.FirstPhoto._shape =  self.displayImage._shape
+                    self._Patient.FirstPhoto._points = self.displayImage._points
+            
+            
+                elif self._file_name == self._Patient.SecondPhoto._file_name:
+                    #the second photo is on display, update the information 
+                    #sfrom the screen to the memory on the econd photo
+                    self._Patient.SecondPhoto._lefteye = self.displayImage._lefteye
+                    self._Patient.SecondPhoto._righteye = self.displayImage._righteye
+                    self._Patient.SecondPhoto._shape =  self.displayImage._shape
+                    self._Patient.SecondPhoto._points = self.displayImage._points
+            
+
                     
                 #compute the facial metrics for the first photo and fill the information 
                 MeasurementsLeftFirst, MeasurementsRightFirst, MeasurementsDeviation, MeasurementsPercentual = get_measurements_from_data(self._Patient.FirstPhoto._shape, self._Patient.FirstPhoto._lefteye, self._Patient.FirstPhoto._righteye, self._CalibrationType, self._CalibrationValue)

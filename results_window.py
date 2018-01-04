@@ -27,7 +27,7 @@ class CustomTabResult(QtWidgets.QWidget):
         super(CustomTabResult, self) .__init__()
 
         
-        scriptDir = os.path.dirname(os.path.realpath(sys.argv[0]))
+        scriptDir = os.getcwd()#os.path.dirname(os.path.realpath(sys.argv[0]))
                 
         spacerh = QtWidgets.QWidget(self)
         spacerh.setFixedSize(10,0)
@@ -327,7 +327,7 @@ class ShowResults(QtWidgets.QWidget):
         super(ShowResults, self).__init__(parent)
         
         self.setWindowTitle('Metrics')
-        scriptDir = os.path.dirname(os.path.realpath(__file__))
+        scriptDir = os.getcwd()#os.path.dirname(os.path.realpath(__file__))
         self.setWindowIcon(QtGui.QIcon(scriptDir + os.path.sep + 'include' +os.path.sep +'icon_color'+ os.path.sep + 'ruler_icon.ico'))
         self._Example_window = None
         
