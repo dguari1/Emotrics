@@ -28,4 +28,5 @@ Alternatively, you can download an .exe file and run Emotrics without any additi
 https://myfiles.meei.harvard.edu/xythoswfs/webui/_xy-e607917_1-t_iNvB5kHE
 
 If you use this software please cite the following paper:
+
 Guarin, Diego L., Joseph Dusseldorp, Tessa A. Hadlock, and Nate Jowett. "A machine learning approach for automated facial measurements in facial palsy." JAMA facial plastic surgery (2018).
