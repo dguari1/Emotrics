@@ -6,8 +6,6 @@ Emotrics works by automatically placing a 68 facial landmarks and using the posi
 estimate a set of facial measurements that can be used to asses facial symmetry and/or evaluate facial neurumuscular diseases. 
 Moreover, results can be used to compare pre and post-procedure photographs to asses the effectiveness of treatment. 
 
-Video tutorials can be found on .../Tutorial
-
 Required packages:
 - dlib 
 - OpenCV 
@@ -24,8 +22,25 @@ this will allow you to use openCV and dlib in your python installation. There ar
 Finally, clone this repository and execute Emotrics.py, this will open the Emotric's Graphical User Interface and allows you to use the software. 
 
 Executable files:
-Alternatively, you can download an .exe file and run Emotrics without any additional installation. The software can be obtained here:
-https://myfiles.meei.harvard.edu/xythoswfs/webui/_xy-e607917_1-t_iNvB5kHE
+Alternatively, you can download an .exe file and run Emotrics without any additional installation. 
+
+Windows 64-bit version of Emotrics can be obtained here:
+https://myfiles.meei.harvard.edu/users/hilll/Jowett-Nate/Emotrics.zip?ticket=t_fkYWvlVo
+
+(this application won't work on windows 32-bit, there is not plan to generate a workable 32-bit app, if you are running a 32-bit machine you would need to use Emotrics via source code). 
+
+Mac version of Emotrics can be obtained here: 
+https://myfiles.meei.harvard.edu/users/hilll/Jowett-Nate/Emotrics_for_MAC.zip?ticket=t_fkYWvlVo
+
+(this application was tested on macOS Sierra, if it doesn't work in your MAC computer, you would need to use Emotrics via source code).
+
+Instructions (for Windows):
+Download the .zip file and unzip it. This will create a folder called Emotrics, localize the executable file Emotrics.exe. Double click on it and the app should start. Depending on your computer this might take a minute or so.  
+
+Instruction (for Mac):
+Download the .zip file and unzip it. This will create a compressed folder called Emotrics_for_MAC.app. Double click on it and the app should start. Depending on your computer this might take a minute or so.
+
+
 
 If you use this software please cite the following paper:
 
