@@ -35,10 +35,10 @@ https://myfiles.meei.harvard.edu/users/hilll/Jowett-Nate/Emotrics_for_MAC.zip?ti
 (this application was tested on macOS Sierra, if it doesn't work in your MAC computer, you would need to use Emotrics via source code).
 
 Instructions (for Windows):
-Download the .zip file and unzip it. This will create a folder called Emotrics, localize the executable file Emotrics.exe. Double click on it and the app should start. Depending on your computer this might take a minute or so.  
+Download the .zip file and unzip it. This will create a folder called Emotrics, localize the executable file Emotrics.exe. Double click on it and the app should start. Depending on your computer this can take up to a minute.  
 
 Instruction (for Mac):
-Download the .zip file and unzip it. This will create a compressed folder called Emotrics_for_MAC.app. Double click on it and the app should start. Depending on your computer this might take a minute or so.
+Download the .zip file and unzip it. This will create a compressed folder called Emotrics_for_MAC.app. Double click on it and the app should start. Depending on your computer this can take up to a minute.
 
 
 
