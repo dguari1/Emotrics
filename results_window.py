@@ -54,7 +54,7 @@ class CustomTabResult(QtWidgets.QWidget):
         self._MRD1 = QtWidgets.QLabel('Marginal reflex distance 1 (mm):')
         self._MRD2 = QtWidgets.QLabel('Marginal reflex distance 2 (mm):')
         self._BH = QtWidgets.QLabel('Brow height (mm):')
-        
+        self._PFH = QtWidgets.QLabel('Palpebral fissure height (mm):')
         #text lines
         
         #Commisure excursion
@@ -147,6 +147,19 @@ class CustomTabResult(QtWidgets.QWidget):
         self._BH_dev_p = QtWidgets.QLineEdit(self)
         self._BH_dev_p.setText("-")
         
+        
+        #Palpebral fissure height 
+        self._PFH_right = QtWidgets.QLineEdit(self)
+        self._PFH_right.setText("-")
+        self._PFH_left = QtWidgets.QLineEdit(self)
+        self._PFH_left.setText("-")
+        self._PFH_dev = QtWidgets.QLineEdit(self)
+        self._PFH_dev.setText("-") 
+        self._PFH_dev_p = QtWidgets.QLineEdit(self)
+        self._PFH_dev_p.setText("-")
+        
+        
+        
         #help buttons
         self._help_CE = QtWidgets.QPushButton('', self)
         self._help_CE.setIcon(QtGui.QIcon(scriptDir + os.path.sep + 'include' +os.path.sep +'icon_color'+ os.path.sep + 'question_icon.png'))
@@ -228,6 +241,16 @@ class CustomTabResult(QtWidgets.QWidget):
         text_BH_content = 'Vertical distance from the mid-pupillary point to the superior border of the brow'        
         self._help_BH.clicked.connect(lambda: self.push_help_CE(pixmap_BH, text_BH_title, text_BH_content))
         self._help_BH.setIconSize(QtCore.QSize(20,20))    
+        
+        
+        self._help_PFH = QtWidgets.QPushButton('', self)
+        self._help_PFH.setIcon(QtGui.QIcon(scriptDir + os.path.sep + 'include' +os.path.sep +'icon_color'+ os.path.sep + 'question_icon.png'))
+        pixmap_PFH = QtGui.QPixmap.fromImage(QtGui.QImage(
+        scriptDir + os.path.sep + 'include' +os.path.sep +'measures'+ os.path.sep + 'palpebral_fissure_height_focus.png'))
+        text_PFH_title = 'Palpebral Fissure Height:'
+        text_PFH_content = 'Vertical distance between medial canthi of the two open lids'        
+        self._help_PFH.clicked.connect(lambda: self.push_help_PFH(pixmap_PFH, text_PFH_title, text_PFH_content))
+        self._help_PFH.setIconSize(QtCore.QSize(20,20))    
 
         layout = QtWidgets.QGridLayout()
         #layout.addWidget(spacerh,0,1)
@@ -264,52 +287,60 @@ class CustomTabResult(QtWidgets.QWidget):
         layout.addWidget(self._MRD2_dev_p,6,8,1,1)
         
         layout.addWidget(spacerv,7,0,6,1)
-        layout.addWidget(self._CE, 8,0,1,1)
-        layout.addWidget(self._help_CE, 8,1,1,1)
-        layout.addWidget(self._CE_right,8,2,1,1)
-        layout.addWidget(self._CE_left,8,4,1,1)
-        layout.addWidget(self._CE_dev,8,6,1,1)
-        layout.addWidget(self._CE_dev_p,8,8,1,1)
+        layout.addWidget(self._PFH, 8,0,1,1)
+        layout.addWidget(self._help_PFH, 8,1,1,1)
+        layout.addWidget(self._PFH_right,8,2,1,1)
+        layout.addWidget(self._PFH_left,8,4,1,1)
+        layout.addWidget(self._PFH_dev,8,6,1,1)
+        layout.addWidget(self._PFH_dev_p,8,8,1,1)
         
-        layout.addWidget(spacerv,9,0,6,1)
-        layout.addWidget(self._CH, 10,0,1,1)
-        layout.addWidget(self._help_CH, 10,1,1,1)
-        layout.addWidget(self._CH_right,10,2,1,1)
-        layout.addWidget(self._CH_left,10,4,1,1)
-        layout.addWidget(self._CH_dev,10,6,1,1)
-        layout.addWidget(self._CH_dev_p,10,8,1,1)
+        layout.addWidget(spacerv,8,0,6,1)
+        layout.addWidget(self._CE, 9,0,1,1)
+        layout.addWidget(self._help_CE, 9,1,1,1)
+        layout.addWidget(self._CE_right,9,2,1,1)
+        layout.addWidget(self._CE_left,9,4,1,1)
+        layout.addWidget(self._CE_dev,9,6,1,1)
+        layout.addWidget(self._CE_dev_p,9,8,1,1)
         
-        layout.addWidget(spacerv,11,0,6,1)
-        layout.addWidget(self._SA, 12,0,1,1)
-        layout.addWidget(self._help_SA, 12,1,1,1)
-        layout.addWidget(self._SA_right,12,2,1,1)
-        layout.addWidget(self._SA_left,12,4,1,1)
-        layout.addWidget(self._SA_dev,12,6,1,1)
-        layout.addWidget(self._SA_dev_p,12,8,1,1)
+        layout.addWidget(spacerv,10,0,6,1)
+        layout.addWidget(self._CH, 11,0,1,1)
+        layout.addWidget(self._help_CH, 11,1,1,1)
+        layout.addWidget(self._CH_right,11,2,1,1)
+        layout.addWidget(self._CH_left,11,4,1,1)
+        layout.addWidget(self._CH_dev,11,6,1,1)
+        layout.addWidget(self._CH_dev_p,11,8,1,1)
         
-        layout.addWidget(spacerv,13,0,6,1)
-        layout.addWidget(self._UVH, 14,0,1,1)
-        layout.addWidget(self._help_UVH, 14,1,1,1)
-        layout.addWidget(self._UVH_right,14,2,1,1)
-        layout.addWidget(self._UVH_left,14,4,1,1)
-        layout.addWidget(self._UVH_dev,14,6,1,1)
-        layout.addWidget(self._UVH_dev_p,14,8,1,1)
+        layout.addWidget(spacerv,12,0,6,1)
+        layout.addWidget(self._SA, 13,0,1,1)
+        layout.addWidget(self._help_SA, 13,1,1,1)
+        layout.addWidget(self._SA_right,13,2,1,1)
+        layout.addWidget(self._SA_left,13,4,1,1)
+        layout.addWidget(self._SA_dev,13,6,1,1)
+        layout.addWidget(self._SA_dev_p,13,8,1,1)
         
-        layout.addWidget(spacerv,15,0,6,1)
-        layout.addWidget(self._DS, 16,0,1,1)
-        layout.addWidget(self._help_DS, 16,1,1,1)
-        layout.addWidget(self._DS_right,16,2,1,1)
-        layout.addWidget(self._DS_left,16,4,1,1)
-        layout.addWidget(self._DS_dev,16,6,1,1)
-        layout.addWidget(self._DS_dev_p,16,8,1,1)
+        layout.addWidget(spacerv,14,0,6,1)
+        layout.addWidget(self._UVH, 15,0,1,1)
+        layout.addWidget(self._help_UVH, 15,1,1,1)
+        layout.addWidget(self._UVH_right,15,2,1,1)
+        layout.addWidget(self._UVH_left,15,4,1,1)
+        layout.addWidget(self._UVH_dev,15,6,1,1)
+        layout.addWidget(self._UVH_dev_p,15,8,1,1)
         
-        layout.addWidget(spacerv,17,0,6,1)
-        layout.addWidget(self._LVH, 18,0,1,1)
-        layout.addWidget(self._help_LVH, 18,1,1,1)
-        layout.addWidget(self._LVH_right,18,2,1,1)
-        layout.addWidget(self._LVH_left,18,4,1,1)
-        layout.addWidget(self._LVH_dev,18,6,1,1)
-        layout.addWidget(self._LVH_dev_p,18,8,1,1)
+        layout.addWidget(spacerv,16,0,6,1)
+        layout.addWidget(self._DS, 17,0,1,1)
+        layout.addWidget(self._help_DS, 17,1,1,1)
+        layout.addWidget(self._DS_right,17,2,1,1)
+        layout.addWidget(self._DS_left,17,4,1,1)
+        layout.addWidget(self._DS_dev,17,6,1,1)
+        layout.addWidget(self._DS_dev_p,17,8,1,1)
+        
+        layout.addWidget(spacerv,18,0,6,1)
+        layout.addWidget(self._LVH, 19,0,1,1)
+        layout.addWidget(self._help_LVH, 19,1,1,1)
+        layout.addWidget(self._LVH_right,19,2,1,1)
+        layout.addWidget(self._LVH_left,19,4,1,1)
+        layout.addWidget(self._LVH_dev,19,6,1,1)
+        layout.addWidget(self._LVH_dev_p,19,8,1,1)
         
         self.setLayout(layout)
         

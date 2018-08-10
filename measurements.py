@@ -217,6 +217,48 @@ def find_mid_point_lips(corner_left, corner_right, center, rot_angle):
     
     return distance_left, distance_right
 
+
+def palpebral_fissure_height(eye, rot_angle, center):
+    
+    rot_matrix=np.array([[np.cos(rot_angle), np.sin(rot_angle)],
+                  [-np.sin(rot_angle), np.cos(rot_angle)]])
+    rot_matrix_inv=np.array([[np.cos(rot_angle), -np.sin(rot_angle)],
+                  [np.sin(rot_angle), np.cos(rot_angle)]])
+    
+    
+    #upper lid
+    x=eye[0:4,0]
+    y=eye[0:4,1]
+    rot_x,rot_y=rot_matrix.dot([x-center[0],y-center[1]])
+    
+    spline_upper= UnivariateSpline(rot_x,rot_y)
+    mid_upper = (rot_x[1]+rot_x[2])/2
+    
+    #lower lid
+    x=eye[[0,5,4,3],0]
+    y=eye[[0,5,4,3],1]
+    rot_x,rot_y=rot_matrix.dot([x-center[0],y-center[1]])
+    
+    spline_lower = UnivariateSpline(rot_x,rot_y, s=1)
+    mid_lower = (rot_x[1]+rot_x[2])/2
+    
+    
+    mid_mid = (mid_upper+mid_lower)/2
+    new_up = spline_upper(mid_mid)
+    new_down = spline_lower(mid_mid)
+    
+    
+    uper_lid_x,uper_lid_y = rot_matrix_inv.dot([mid_mid,new_up])
+    uper_lid_x=uper_lid_x+center[0]
+    uper_lid_y=uper_lid_y+center[1]
+    
+    lower_lid_x,lower_lid_y = rot_matrix_inv.dot([mid_mid,new_down])
+    lower_lid_x=lower_lid_x+center[0]
+    lower_lid_y=lower_lid_y+center[1]
+    
+    
+    return np.sqrt((uper_lid_x-lower_lid_x)**2 + (uper_lid_y-lower_lid_y)**2)
+
     
 class FaceMeasurementsSide(object):
     
@@ -227,6 +269,7 @@ class FaceMeasurementsSide(object):
         self.MarginalReflexDistance2 = 0 
         self.BrowHeight = 0 
         self.DentalShow = 0 
+        self.PalpebralFissureHeight = 0
         
 class FaceMeasurementsDeviation(object):
     
@@ -241,6 +284,7 @@ class FaceMeasurementsDeviation(object):
         self.MarginalReflexDistance2 = 0 
         self.BrowHeight = 0 
         self.DentalShow = 0
+        self.PalpebralFissureHeight = 0
     
     
 
@@ -398,8 +442,11 @@ def get_measurements_from_data(shape, left_pupil, right_pupil, CalibrationType, 
     _ , _ , ResultsRight.BrowHeight = mouth_measures(right_pupil[0:2], cross_brow_right, rot_angle)
     
     
-    
-    
+
+    #Palpebral Fissure Height 
+    PalpebralFissureHeight_Right = palpebral_fissure_height(shape[36:42,:], rot_angle, center)
+    PalpebralFissureHeight_Left = palpebral_fissure_height(shape[42:48,:], rot_angle, center)
+
     
     radius=(left_pupil[2]+right_pupil[2])/2
     if CalibrationType == 'Iris': #Iris radius will be used as calibration
@@ -414,6 +461,7 @@ def get_measurements_from_data(shape, left_pupil, right_pupil, CalibrationType, 
     ResultsLeft.MarginalReflexDistance1 = ResultsLeft.MarginalReflexDistance1*Calibration
     ResultsLeft.MarginalReflexDistance2 = ResultsLeft.MarginalReflexDistance2*Calibration
     ResultsLeft.BrowHeight = ResultsLeft.BrowHeight*Calibration
+    ResultsLeft.PalpebralFissureHeight = PalpebralFissureHeight_Left*Calibration
     
     
     ResultsRight.CommissureExcursion = ResultsRight.CommissureExcursion*Calibration
@@ -421,6 +469,7 @@ def get_measurements_from_data(shape, left_pupil, right_pupil, CalibrationType, 
     ResultsRight.MarginalReflexDistance1 = ResultsRight.MarginalReflexDistance1*Calibration
     ResultsRight.MarginalReflexDistance2 = ResultsRight.MarginalReflexDistance2*Calibration
     ResultsRight.BrowHeight = ResultsRight.BrowHeight*Calibration
+    ResultsRight.PalpebralFissureHeight = PalpebralFissureHeight_Right*Calibration
     
     ResultsDeviation.CommisureHeightDeviation = ResultsDeviation.CommisureHeightDeviation*Calibration
     ResultsDeviation.UpperLipHeightDeviation = ResultsDeviation.UpperLipHeightDeviation*Calibration
@@ -445,6 +494,11 @@ def get_measurements_from_data(shape, left_pupil, right_pupil, CalibrationType, 
             ResultsPercentile.DentalShow = (ResultsLeft.DentalShow - ResultsRight.DentalShow)*100/ResultsLeft.DentalShow   
         else:
             ResultsPercentile.DentalShow = 0
+        
+        if ResultsLeft.PalpebralFissureHeight > 0:
+            ResultsPercentile.PalpebralFissureHeight = (ResultsLeft.PalpebralFissureHeight - ResultsRight.PalpebralFissureHeight)*100/ResultsLeft.PalpebralFissureHeight
+        else:
+            ResultsPercentile.PalpebralFissureHeight = 0
     else:  #right is the good side 
         ResultsPercentile.BrowHeight = abs(ResultsLeft.BrowHeight - ResultsRight.BrowHeight)*100/ResultsRight.BrowHeight
         ResultsPercentile.MarginalReflexDistance1 = abs(ResultsLeft.MarginalReflexDistance1 - ResultsRight.MarginalReflexDistance1)*100/ResultsRight.MarginalReflexDistance1
@@ -455,10 +509,15 @@ def get_measurements_from_data(shape, left_pupil, right_pupil, CalibrationType, 
             ResultsPercentile.DentalShow = abs(ResultsLeft.DentalShow - ResultsRight.DentalShow)*100/ResultsRight.DentalShow
         else:
             ResultsPercentile.DentalShow =0     
+        
+        if ResultsRight.PalpebralFissureHeight > 0:
+            ResultsPercentile.PalpebralFissureHeight = abs(ResultsLeft.PalpebralFissureHeight - ResultsRight.PalpebralFissureHeight)*100/ResultsRight.PalpebralFissureHeight
+        else:
+            ResultsPercentile.PalpebralFissureHeight = 0
     
 
-    
-    
+    print( ResultsLeft.PalpebralFissureHeight,ResultsRight.PalpebralFissureHeight)
+
     
     return ResultsLeft, ResultsRight, ResultsDeviation, ResultsPercentile
     
