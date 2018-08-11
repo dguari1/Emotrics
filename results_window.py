@@ -248,8 +248,8 @@ class CustomTabResult(QtWidgets.QWidget):
         pixmap_PFH = QtGui.QPixmap.fromImage(QtGui.QImage(
         scriptDir + os.path.sep + 'include' +os.path.sep +'measures'+ os.path.sep + 'palpebral_fissure_height_focus.png'))
         text_PFH_title = 'Palpebral Fissure Height:'
-        text_PFH_content = 'Vertical distance between medial canthi of the two open lids'        
-        self._help_PFH.clicked.connect(lambda: self.push_help_PFH(pixmap_PFH, text_PFH_title, text_PFH_content))
+        text_PFH_content = 'Vertical distance between medial canthi of the two open lids'          
+        self._help_PFH.clicked.connect(lambda: self.push_help_CE(pixmap_PFH, text_PFH_title, text_PFH_content))
         self._help_PFH.setIconSize(QtCore.QSize(20,20))    
 
         layout = QtWidgets.QGridLayout()

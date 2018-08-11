@@ -362,6 +362,7 @@ class window(QtWidgets.QWidget):
                 self._tab1_results._MRD1_right.setText('{0:.2f}'.format(MeasurementsRight.MarginalReflexDistance1))
                 self._tab1_results._MRD2_right.setText('{0:.2f}'.format(MeasurementsRight.MarginalReflexDistance2))
                 self._tab1_results._BH_right.setText('{0:.2f}'.format(MeasurementsRight.BrowHeight))
+                self._tab1_results._PFH_right.setText('{0:.2f}'.format(MeasurementsRight.PalpebralFissureHeight))
     
                 
                 #filling the info for the left
@@ -371,6 +372,7 @@ class window(QtWidgets.QWidget):
                 self._tab1_results._MRD1_left.setText('{0:.2f}'.format(MeasurementsLeft.MarginalReflexDistance1))
                 self._tab1_results._MRD2_left.setText('{0:.2f}'.format(MeasurementsLeft.MarginalReflexDistance2))
                 self._tab1_results._BH_left.setText('{0:.2f}'.format(MeasurementsLeft.BrowHeight))
+                self._tab1_results._PFH_left.setText('{0:.2f}'.format(MeasurementsLeft.PalpebralFissureHeight))
                 
                 #deviation
                 self._tab1_results._CE_dev.setText('{0:.2f}'.format(MeasurementsDeviation.CommissureExcursion))
@@ -382,6 +384,8 @@ class window(QtWidgets.QWidget):
                 self._tab1_results._CH_dev.setText('{0:.2f}'.format(MeasurementsDeviation.CommisureHeightDeviation))
                 self._tab1_results._UVH_dev.setText('{0:.2f}'.format(MeasurementsDeviation.UpperLipHeightDeviation))
                 self._tab1_results._LVH_dev.setText('{0:.2f}'.format(MeasurementsDeviation.LowerLipHeightDeviation))
+                self._tab1_results._PFH_dev.setText('{0:.2f}'.format(MeasurementsDeviation.PalpebralFissureHeight))
+                
                 
                 self._tab1_results._CE_dev_p.setText('{0:.2f}'.format(MeasurementsPercentual.CommissureExcursion))
                 self._tab1_results._SA_dev_p.setText('{0:.2f}'.format(MeasurementsPercentual.SmileAngle))
@@ -389,6 +393,7 @@ class window(QtWidgets.QWidget):
                 self._tab1_results._MRD2_dev_p.setText('{0:.2f}'.format(MeasurementsPercentual.MarginalReflexDistance2))
                 self._tab1_results._BH_dev_p.setText('{0:.2f}'.format(MeasurementsPercentual.BrowHeight))
                 self._tab1_results._DS_dev_p.setText('{0:.2f}'.format(MeasurementsPercentual.DentalShow))
+                self._tab1_results._PFH_dev_p.setText('{0:.2f}'.format(MeasurementsPercentual.PalpebralFissureHeight))
                 
                 
                 delimiter = os.path.sep
@@ -444,7 +449,7 @@ class window(QtWidgets.QWidget):
                 self._tab1_results._MRD1_right.setText('{0:.2f}'.format(MeasurementsRightFirst.MarginalReflexDistance1))
                 self._tab1_results._MRD2_right.setText('{0:.2f}'.format(MeasurementsRightFirst.MarginalReflexDistance2))
                 self._tab1_results._BH_right.setText('{0:.2f}'.format(MeasurementsRightFirst.BrowHeight))
-    
+                self._tab1_results._PFH_right.setText('{0:.2f}'.format(MeasurementsRightFirst.PalpebralFissureHeight))
                 
                 #filling the info for the left
                 self._tab1_results._CE_left.setText('{0:.2f}'.format(MeasurementsLeftFirst.CommissureExcursion))
@@ -453,6 +458,7 @@ class window(QtWidgets.QWidget):
                 self._tab1_results._MRD1_left.setText('{0:.2f}'.format(MeasurementsLeftFirst.MarginalReflexDistance1))
                 self._tab1_results._MRD2_left.setText('{0:.2f}'.format(MeasurementsLeftFirst.MarginalReflexDistance2))
                 self._tab1_results._BH_left.setText('{0:.2f}'.format(MeasurementsLeftFirst.BrowHeight))
+                self._tab1_results._PFH_left.setText('{0:.2f}'.format(MeasurementsLeftFirst.PalpebralFissureHeight))
                 
                 #deviation
                 self._tab1_results._CE_dev.setText('{0:.2f}'.format(MeasurementsDeviation.CommissureExcursion))
@@ -464,6 +470,7 @@ class window(QtWidgets.QWidget):
                 self._tab1_results._CH_dev.setText('{0:.2f}'.format(MeasurementsDeviation.CommisureHeightDeviation))
                 self._tab1_results._UVH_dev.setText('{0:.2f}'.format(MeasurementsDeviation.UpperLipHeightDeviation))
                 self._tab1_results._LVH_dev.setText('{0:.2f}'.format(MeasurementsDeviation.LowerLipHeightDeviation))
+                self._tab1_results._PFH_dev.setText('{0:.2f}'.format(MeasurementsDeviation.PalpebralFissureHeight))
                 
                 self._tab1_results._CE_dev_p.setText('{0:.2f}'.format(MeasurementsPercentual.CommissureExcursion))
                 self._tab1_results._SA_dev_p.setText('{0:.2f}'.format(MeasurementsPercentual.SmileAngle))
@@ -471,6 +478,7 @@ class window(QtWidgets.QWidget):
                 self._tab1_results._MRD2_dev_p.setText('{0:.2f}'.format(MeasurementsPercentual.MarginalReflexDistance2))
                 self._tab1_results._BH_dev_p.setText('{0:.2f}'.format(MeasurementsPercentual.BrowHeight))
                 self._tab1_results._DS_dev_p.setText('{0:.2f}'.format(MeasurementsPercentual.DentalShow))
+                self._tab1_results._PFH_dev_p.setText('{0:.2f}'.format(MeasurementsPercentual.PalpebralFissureHeight))
                 
                 
                 self._tab1_results._tab_name=self._Patient.FirstPhoto._ID
@@ -488,6 +496,7 @@ class window(QtWidgets.QWidget):
                 self._tab2_results._MRD1_right.setText('{0:.2f}'.format(MeasurementsRightSecond.MarginalReflexDistance1))
                 self._tab2_results._MRD2_right.setText('{0:.2f}'.format(MeasurementsRightSecond.MarginalReflexDistance2))
                 self._tab2_results._BH_right.setText('{0:.2f}'.format(MeasurementsRightSecond.BrowHeight))
+                self._tab2_results._PFH_right.setText('{0:.2f}'.format(MeasurementsRightSecond.PalpebralFissureHeight))
     
                 
                 #filling the info for the left
@@ -497,6 +506,7 @@ class window(QtWidgets.QWidget):
                 self._tab2_results._MRD1_left.setText('{0:.2f}'.format(MeasurementsLeftSecond.MarginalReflexDistance1))
                 self._tab2_results._MRD2_left.setText('{0:.2f}'.format(MeasurementsLeftSecond.MarginalReflexDistance2))
                 self._tab2_results._BH_left.setText('{0:.2f}'.format(MeasurementsLeftSecond.BrowHeight))
+                self._tab2_results._PFH_left.setText('{0:.2f}'.format(MeasurementsLeftSecond.PalpebralFissureHeight))
                 
                 #deviation
                 self._tab2_results._CE_dev.setText('{0:.2f}'.format(MeasurementsDeviation.CommissureExcursion))
@@ -508,6 +518,7 @@ class window(QtWidgets.QWidget):
                 self._tab2_results._CH_dev.setText('{0:.2f}'.format(MeasurementsDeviation.CommisureHeightDeviation))
                 self._tab2_results._UVH_dev.setText('{0:.2f}'.format(MeasurementsDeviation.UpperLipHeightDeviation))
                 self._tab2_results._LVH_dev.setText('{0:.2f}'.format(MeasurementsDeviation.LowerLipHeightDeviation))
+                self._tab2_results._PFH_dev.setText('{0:.2f}'.format(MeasurementsDeviation.PalpebralFissureHeight))
                 
                 self._tab2_results._CE_dev_p.setText('{0:.2f}'.format(MeasurementsPercentual.CommissureExcursion))
                 self._tab2_results._SA_dev_p.setText('{0:.2f}'.format(MeasurementsPercentual.SmileAngle))
@@ -515,6 +526,7 @@ class window(QtWidgets.QWidget):
                 self._tab2_results._MRD2_dev_p.setText('{0:.2f}'.format(MeasurementsPercentual.MarginalReflexDistance2))
                 self._tab2_results._BH_dev_p.setText('{0:.2f}'.format(MeasurementsPercentual.BrowHeight))
                 self._tab2_results._DS_dev_p.setText('{0:.2f}'.format(MeasurementsPercentual.DentalShow))
+                self._tab2_results._PFH_dev_p.setText('{0:.2f}'.format(MeasurementsPercentual.PalpebralFissureHeight))
                 
                 
                 self._tab2_results._tab_name=self._Patient.SecondPhoto._ID
@@ -530,7 +542,7 @@ class window(QtWidgets.QWidget):
                 self._tab3_results._MRD1_right.setText('{0:.2f}'.format(-MeasurementsRightFirst.MarginalReflexDistance1+MeasurementsRightSecond.MarginalReflexDistance1))
                 self._tab3_results._MRD2_right.setText('{0:.2f}'.format(-MeasurementsRightFirst.MarginalReflexDistance2+MeasurementsRightSecond.MarginalReflexDistance2))
                 self._tab3_results._BH_right.setText('{0:.2f}'.format(-MeasurementsRightFirst.BrowHeight+MeasurementsRightSecond.BrowHeight))
-    
+                self._tab3_results._PFH_right.setText('{0:.2f}'.format(-MeasurementsRightFirst.PalpebralFissureHeight+MeasurementsRightSecond.PalpebralFissureHeight))
                 
                 #filling the info for the left
                 self._tab3_results._CE_left.setText('{0:.2f}'.format(-MeasurementsLeftFirst.CommissureExcursion+MeasurementsLeftSecond.CommissureExcursion))
@@ -539,6 +551,7 @@ class window(QtWidgets.QWidget):
                 self._tab3_results._MRD1_left.setText('{0:.2f}'.format(-MeasurementsLeftFirst.MarginalReflexDistance1+MeasurementsLeftSecond.MarginalReflexDistance1))
                 self._tab3_results._MRD2_left.setText('{0:.2f}'.format(-MeasurementsLeftFirst.MarginalReflexDistance2+MeasurementsLeftSecond.MarginalReflexDistance2))
                 self._tab3_results._BH_left.setText('{0:.2f}'.format(-MeasurementsLeftFirst.BrowHeight+MeasurementsLeftSecond.BrowHeight))
+                self._tab3_results._PFH_left.setText('{0:.2f}'.format(-MeasurementsLeftFirst.PalpebralFissureHeight+MeasurementsLeftSecond.PalpebralFissureHeight))
                 
                 
                 #say to the window that presents the results that there are 3 tabs

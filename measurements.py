@@ -482,21 +482,22 @@ def get_measurements_from_data(shape, left_pupil, right_pupil, CalibrationType, 
     ResultsDeviation.MarginalReflexDistance1 = abs(ResultsLeft.MarginalReflexDistance1-ResultsRight.MarginalReflexDistance1)
     ResultsDeviation.MarginalReflexDistance2 = abs(ResultsLeft.MarginalReflexDistance2-ResultsRight.MarginalReflexDistance2)
     ResultsDeviation.BrowHeight = abs(ResultsLeft.BrowHeight-ResultsRight.BrowHeight)
+    ResultsDeviation.PalpebralFissureHeight = abs(ResultsLeft.PalpebralFissureHeight - ResultsRight.PalpebralFissureHeight)
 
 
-    if shape[57,0] >= cross_lowerlip[0] : #left is the good side
+    if shape[57,0] >= cross_lowerlip[0] : #left is the good side (probably)
         ResultsPercentile.BrowHeight = abs(ResultsLeft.BrowHeight - ResultsRight.BrowHeight)*100/ResultsLeft.BrowHeight
         ResultsPercentile.MarginalReflexDistance1 = abs(ResultsLeft.MarginalReflexDistance1 - ResultsRight.MarginalReflexDistance1)*100/ResultsLeft.MarginalReflexDistance1
         ResultsPercentile.MarginalReflexDistance2 = abs(ResultsLeft.MarginalReflexDistance2 - ResultsRight.MarginalReflexDistance2)*100/ResultsLeft.MarginalReflexDistance2
         ResultsPercentile.CommissureExcursion = abs(ResultsLeft.CommissureExcursion - ResultsRight.CommissureExcursion)*100/ResultsLeft.CommissureExcursion
-        ResultsPercentile.SmileAngle = (ResultsLeft.SmileAngle - ResultsRight.SmileAngle)*100/ResultsLeft.SmileAngle
+        ResultsPercentile.SmileAngle = abs(ResultsLeft.SmileAngle - ResultsRight.SmileAngle)*100/ResultsLeft.SmileAngle
         if ResultsLeft.DentalShow >0:
-            ResultsPercentile.DentalShow = (ResultsLeft.DentalShow - ResultsRight.DentalShow)*100/ResultsLeft.DentalShow   
+            ResultsPercentile.DentalShow = abs(ResultsLeft.DentalShow - ResultsRight.DentalShow)*100/ResultsLeft.DentalShow   
         else:
             ResultsPercentile.DentalShow = 0
         
         if ResultsLeft.PalpebralFissureHeight > 0:
-            ResultsPercentile.PalpebralFissureHeight = (ResultsLeft.PalpebralFissureHeight - ResultsRight.PalpebralFissureHeight)*100/ResultsLeft.PalpebralFissureHeight
+            ResultsPercentile.PalpebralFissureHeight = abs(ResultsLeft.PalpebralFissureHeight - ResultsRight.PalpebralFissureHeight)*100/ResultsLeft.PalpebralFissureHeight
         else:
             ResultsPercentile.PalpebralFissureHeight = 0
     else:  #right is the good side 
@@ -516,7 +517,7 @@ def get_measurements_from_data(shape, left_pupil, right_pupil, CalibrationType, 
             ResultsPercentile.PalpebralFissureHeight = 0
     
 
-    print( ResultsLeft.PalpebralFissureHeight,ResultsRight.PalpebralFissureHeight)
+    print( ResultsLeft.PalpebralFissureHeight,ResultsRight.PalpebralFissureHeight,ResultsPercentile.PalpebralFissureHeight)
 
     
     return ResultsLeft, ResultsRight, ResultsDeviation, ResultsPercentile
