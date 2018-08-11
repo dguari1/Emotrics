@@ -517,7 +517,7 @@ def get_measurements_from_data(shape, left_pupil, right_pupil, CalibrationType, 
             ResultsPercentile.PalpebralFissureHeight = 0
     
 
-    print( ResultsLeft.PalpebralFissureHeight,ResultsRight.PalpebralFissureHeight,ResultsPercentile.PalpebralFissureHeight)
+
 
     
     return ResultsLeft, ResultsRight, ResultsDeviation, ResultsPercentile

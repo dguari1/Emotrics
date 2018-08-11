@@ -107,7 +107,10 @@ class CreatePatient(QDialog):
     def initUI(self):
         
         self.setWindowTitle('Create Patient')
-        scriptDir = os.getcwd()#os.path.dirname(os.path.realpath(__file__))
+        if os.name is 'posix': #is a mac or linux
+            scriptDir = os.path.dirname(sys.argv[0])
+        else: #is a  windows 
+            scriptDir = os.getcwd()
         self.setWindowIcon(QtGui.QIcon(scriptDir + os.path.sep + 'include' +os.path.sep +'icon_color'+ os.path.sep + 'patient_icon.ico'))
         
         self.main_Widget = QtWidgets.QWidget(self)

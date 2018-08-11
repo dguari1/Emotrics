@@ -115,7 +115,12 @@ class window(QtWidgets.QWidget):
         super(window, self).__init__()
         #self.setGeometry(5,60,700,500)
         self.setWindowTitle('Emotrics')
-        scriptDir = os.getcwd()#os.path.dirname(os.path.realpath(sys.argv[0]))
+        
+        if os.name is 'posix': #is a mac or linux
+            scriptDir = os.path.dirname(sys.argv[0])
+        else: #is a  windows 
+            scriptDir = os.getcwd()
+
         self.setWindowIcon(QtGui.QIcon(scriptDir + os.path.sep + 'include' +os.path.sep +'icon_color'+ os.path.sep + 'meei_3WR_icon.ico'))
         
         self._new_window = None
@@ -149,9 +154,12 @@ class window(QtWidgets.QWidget):
         
     def initUI(self):
         #local directory
-        scriptDir = os.getcwd()#os.path.dirname(os.path.realpath(sys.argv[0]))
+        
+        if os.name is 'posix': #is a mac or linux
+            scriptDir = os.path.dirname(sys.argv[0])
+        else: #is a  windows 
+            scriptDir = os.getcwd()
 
-        #image
         #read the image from file        
         img_Qt = QtGui.QImage(scriptDir + os.path.sep + 'include' +os.path.sep +'icon_color'+ os.path.sep + 'Facial-Nerve-Center.jpg')
         img_show = QtGui.QPixmap.fromImage(img_Qt)
@@ -214,6 +222,10 @@ class window(QtWidgets.QWidget):
         settingsAction.setIcon(QtGui.QIcon(scriptDir + os.path.sep + 'include' +os.path.sep +'icon_color'+ os.path.sep + 'settings-icon.png'))
         settingsAction.triggered.connect(self.settings)
         
+        AboutAction = QtWidgets.QAction('About', self)
+        AboutAction.setIcon(QtGui.QIcon(scriptDir + os.path.sep + 'include' +os.path.sep +'icon_color'+ os.path.sep + 'question_icon.png'))
+        AboutAction.triggered.connect(self.about_app)
+        
         exitAction = QtWidgets.QAction('Exit', self)
         exitAction.setIcon(QtGui.QIcon(scriptDir + os.path.sep + 'include' +os.path.sep +'icon_color'+ os.path.sep + 'exit_icon.png'))
         exitAction.triggered.connect(self.close_app)
@@ -224,7 +236,7 @@ class window(QtWidgets.QWidget):
         self.toolBar.addActions((loadAction, createPatientAction, self.changephotoAction, 
                                  fitAction, eyeAction, eyeLoad,centerAction, toggleAction,
                                  measuresAction, snapshotAction, saveAction,  settingsAction, 
-                                 exitAction))
+                                 AboutAction,exitAction))
         
         #set the size of each icon to 50x50
         self.toolBar.setIconSize(QtCore.QSize(50,50))
@@ -882,8 +894,12 @@ class window(QtWidgets.QWidget):
         elif Settings.tab2._checkBox1.isChecked() == True:
             self._ModelName = 'MEE'
             
-
+    def about_app(self):
         
+        #show a window with some information
+        QtWidgets.QMessageBox.information(self, 'Emotrics', 
+                            'Emotrics is a tool that provides objective facial measurements, it uses machine learning to automatically localize facial landmarks in photographs. its objective is to reduce subjectivity in the evaluation of facial palsy.\n\nEmotrics was developed by Diego L. Guarin at the Facial Nerve Centre of the Massachusetts Eye and Ear Infirmary.\n\nA tutorial can be found on YouTube, just search for Emotrics.\n\nThis is an open source software provided with absolutely no guarantees. You can run, study, share and modify the software. It is distributed under the GNU General Public License.\n\nThis software was written in Python, source code and additional information can be found in github.com/dguari1/Emotrics ', 
+                            QtWidgets.QMessageBox.Ok)     
             
     def close_app(self):  
         

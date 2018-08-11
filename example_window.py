@@ -32,7 +32,11 @@ class ShowExample(QtWidgets.QMainWindow):
 
         
         
-        scriptDir = os.getcwd()#os.path.dirname(os.path.realpath(sys.argv[0]))
+        if os.name is 'posix': #is a mac or linux
+            scriptDir = os.path.dirname(sys.argv[0])
+        else: #is a  windows 
+                scriptDir = os.getcwd()
+                
         img_Qt = QtGui.QImage(scriptDir + os.path.sep + 'include' +os.path.sep +'icons'+ os.path.sep + 'Facial-Nerve-Center.jpg')
         pixmap = QtGui.QPixmap.fromImage(img_Qt)
         self._view_photo = ImageViewer()

@@ -27,7 +27,10 @@ class CustomTabResult(QtWidgets.QWidget):
         super(CustomTabResult, self) .__init__()
 
         
-        scriptDir = os.getcwd()#os.path.dirname(os.path.realpath(sys.argv[0]))
+        if os.name is 'posix': #is a mac or linux
+            scriptDir = os.path.dirname(sys.argv[0])
+        else: #is a  windows 
+            scriptDir = os.getcwd()
                 
         spacerh = QtWidgets.QWidget(self)
         spacerh.setFixedSize(10,0)
@@ -345,17 +348,12 @@ class CustomTabResult(QtWidgets.QWidget):
         self.setLayout(layout)
         
     def push_help_CE(self, pixmap, text_title='', text_content=''):  
-        print('1')
         self._Example_window =  ShowExample()
-        print('2')
         self._Example_window._view_photo.setPhoto(pixmap)
-        print('3')
         self._Example_window.label_title.setText(text_title)
-        print('4')
         self._Example_window.label_content.setText(text_content)
-        print('5')
         self._Example_window.show()
-        print('6')
+
 
 
 
@@ -364,7 +362,10 @@ class ShowResults(QtWidgets.QWidget):
         super(ShowResults, self).__init__(parent)
         
         self.setWindowTitle('Metrics')
-        scriptDir = os.getcwd()#os.path.dirname(os.path.realpath(__file__))
+        if os.name is 'posix': #is a mac or linux
+            scriptDir = os.path.dirname(sys.argv[0])
+        else: #is a  windows 
+            scriptDir = os.getcwd()
         self.setWindowIcon(QtGui.QIcon(scriptDir + os.path.sep + 'include' +os.path.sep +'icon_color'+ os.path.sep + 'ruler_icon.ico'))
         self._Example_window = None
         

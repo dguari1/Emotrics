@@ -16,7 +16,11 @@ class ShowResults(QtWidgets.QMainWindow):
         super(ShowResults, self).__init__()
         
         self.setWindowTitle('Metrics')
-        scriptDir = os.getcwd()#os.path.dirname(os.path.realpath(sys.argv[0]))
+        if os.name is 'posix': #is a mac or linux
+            scriptDir = os.path.dirname(sys.argv[0])
+        else: #is a  windows 
+            scriptDir = os.getcwd()
+                
         self.setWindowIcon(QtGui.QIcon(scriptDir + os.path.sep + 'include' +os.path.sep + 'ruler_icon.ico'))
         self._new_window = None
         

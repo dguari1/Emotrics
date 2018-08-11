@@ -5,6 +5,7 @@ Created on Sat Dec  2 10:33:30 2017
 @author: Diego L.Guarin -- diego_guarin at meei.harvard.edu
 """
 import os
+import sys
 import numpy as np
 import pandas as pd
 from openpyxl import load_workbook
@@ -83,7 +84,11 @@ class SaveWindow(QDialog):
     def initUI(self):
         
         self.setWindowTitle('Save')
-        scriptDir = os.getcwd()#os.path.dirname(os.path.realpath(__file__))
+        if os.name is 'posix': #is a mac or linux
+            scriptDir = os.path.dirname(sys.argv[0])
+        else: #is a  windows 
+            scriptDir = os.getcwd()
+            
         self.setWindowIcon(QtGui.QIcon(scriptDir + os.path.sep + 'include' +os.path.sep +'icon_color'+ os.path.sep + 'save_icon.ico'))
         
         self.main_Widget = QtWidgets.QWidget(self)
@@ -295,7 +300,7 @@ class SaveWindow(QDialog):
     def Save(self):
         
         
-        number_of_measurements = 9
+        number_of_measurements = 10
         Columns = ['Right','Left','Deviation (absolute)','Deviation (percent)']
         Columns = Columns * number_of_measurements
         
@@ -308,7 +313,7 @@ class SaveWindow(QDialog):
         
         
         
-        temp = ['Brow Height', 'Marginal Reflex Distance 1', 'Marginal Reflex Distance 2', 
+        temp = ['Brow Height', 'Marginal Reflex Distance 1', 'Marginal Reflex Distance 2', 'Palpebral Fissure Height',
                 'Commisure Excursion', 'Commisure Height Deviation', 'Smile Angle',
                 'Upper Lip Height Deviation', 'Dental Show', 'Lower Lip Height Deviation']
         number_of_repetitions=4
@@ -326,7 +331,7 @@ class SaveWindow(QDialog):
         
         
         #measurements
-        elements = ['BH', 'MRD1', 'MRD2', 'CE', 'CH', 'SA', 'UVH', 'DS', 'LVH']
+        elements = ['BH', 'MRD1', 'MRD2', 'PFH', 'CE', 'CH', 'SA', 'UVH', 'DS', 'LVH']
         
         MeasurementsLeft = self._MeasurementsLeft
         MeasurementsRight = self._MeasurementsRight
@@ -339,6 +344,8 @@ class SaveWindow(QDialog):
         #MRD1=np.array([[1,1,1,1]],dtype = object)
         MRD2 = np.array([[MeasurementsRight.MarginalReflexDistance2, MeasurementsLeft.MarginalReflexDistance2,MeasurementsDeviation.MarginalReflexDistance2,MeasurementsPercentual.MarginalReflexDistance2]],dtype=object)
         #MRD2=np.array([[1,1,1,1]],dtype = object)
+        PFH = np.array([[MeasurementsRight.PalpebralFissureHeight, MeasurementsLeft.PalpebralFissureHeight,MeasurementsDeviation.PalpebralFissureHeight,MeasurementsPercentual.PalpebralFissureHeight]],dtype=object)
+        
         CE = np.array([[MeasurementsRight.CommissureExcursion, MeasurementsLeft.CommissureExcursion,MeasurementsDeviation.CommissureExcursion,MeasurementsPercentual.CommissureExcursion]],dtype=object)
         #CE=np.array([[1,1,1,1]],dtype = object)
         CH = np.array([['', '',MeasurementsDeviation.CommisureHeightDeviation,'']],dtype=object)
@@ -375,7 +382,7 @@ class SaveWindow(QDialog):
         fill= np.append(fill, AD, axis = 1)
         
         
-
+        
 
         
         if self._NewFile: #the user wants to create a new file
@@ -399,11 +406,12 @@ class SaveWindow(QDialog):
             df.to_excel(writer, sheet_name='Sheet1', index = True)
 
             #adjust the size of each column to fit the text
-            size_list = [15,20,20,20,20,10,10,18,18,10,10,18,18,10,10,18,18,10,10,18,18,10,10,18,18,10,10,18,18,10,10,18,18,10,10,18,18,10,10,18,18,20]
+            size_list = [15,20,20,20,20,10,10,18,18,10,10,18,18,10,10,18,18,10,10,18,18,10,10,18,18,10,10,18,18,10,10,18,18,10,10,18,18,10,10,18,18,10,10,18,18,20]
+            
             
             worksheet = writer.sheets['Sheet1']
-            for k in range (0,42):
-                worksheet.set_column(k,k,size_list[k])
+            for k,m in enumerate(size_list):
+                worksheet.set_column(k,k,m)
 
             writer.save()
             self.close() 
@@ -425,8 +433,9 @@ class SaveWindow(QDialog):
             #load data from file and arrange its columns to fit the template
             old_df = pd.read_excel(str(self._SelectFile.text()), sheetname=0,header=[0, 1], index_col=0)
             
+            
             #verify if the loaded file is valid
-            if len(old_df.columns) is 41:
+            if len(old_df.columns) is 45:
             
                 old_df.columns = pd.MultiIndex.from_tuples(df.columns)
             
@@ -441,11 +450,11 @@ class SaveWindow(QDialog):
                 resuls.to_excel(writer, sheet_name='Sheet1', index = True)
                 
                 #adjust the size of each column to fit the text
-                size_list = [15,20,20,20,20,10,10,18,18,10,10,18,18,10,10,18,18,10,10,18,18,10,10,18,18,10,10,18,18,10,10,18,18,10,10,18,18,10,10,18,18,20]
+                size_list = [15,20,20,20,20,10,10,18,18,10,10,18,18,10,10,18,18,10,10,18,18,10,10,18,18,10,10,18,18,10,10,18,18,10,10,18,18,10,10,18,18,10,10,18,18,20]
                 
                 worksheet = writer.sheets['Sheet1']
-                for k in range (0,42):
-                    worksheet.set_column(k,k,size_list[k])
+                for k,m in enumerate(size_list):
+                    worksheet.set_column(k,k,m)
                 
                 writer.save()
                 self.close() 
