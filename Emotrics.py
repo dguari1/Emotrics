@@ -898,7 +898,7 @@ class window(QtWidgets.QWidget):
         
         #show a window with some information
         QtWidgets.QMessageBox.information(self, 'Emotrics', 
-                            'Emotrics is a tool that provides objective facial measurements, it uses machine learning to automatically localize facial landmarks in photographs. its objective is to reduce subjectivity in the evaluation of facial palsy.\n\nEmotrics was developed by Diego L. Guarin at the Facial Nerve Centre of the Massachusetts Eye and Ear Infirmary.\n\nA tutorial can be found on YouTube, just search for Emotrics.\n\nThis is an open source software provided with absolutely no guarantees. You can run, study, share and modify the software. It is distributed under the GNU General Public License.\n\nThis software was written in Python, source code and additional information can be found in github.com/dguari1/Emotrics ', 
+                            'Emotrics is a tool for estimation of objective facial measurements, it uses machine learning to automatically localize facial landmarks in photographs. Its objective is to reduce subjectivity in the evaluation of facial palsy.\n\nEmotrics was developed by: Diego L. Guarin, PhD. at the Facial Nerve Centre, Massachusetts Eye and Ear Infirmary; part of Harvard Medical School.\n\nA tutorial can be found by searching for Emotrics on YouTube.\n\nThis is an open source software provided with absolutely no guarantees. You can run, study, share and modify the software. It is distributed under the GNU General Public License.\n\nThis software was written in Python, source code and additional information can be found in github.com/dguari1/Emotrics ', 
                             QtWidgets.QMessageBox.Ok)     
             
     def close_app(self):  
