@@ -162,7 +162,81 @@ class ModelTab(QtWidgets.QWidget):
     def push_help_checkBox2(self):
         QtWidgets.QMessageBox.information(self, 'iBUG Database', 
                             'Database created as part of the iBUG project, it contains thousands of images taken in the wild along with face portaits obtained from the web', 
-                            QtWidgets.QMessageBox.Ok)        
+                            QtWidgets.QMessageBox.Ok)   
+        
+        
+#class LandmarksSizeandColorTab(QtWidgets.QWidget):
+#    
+#    def __init__(self,parent=None, LandmarksSize=1, LandmarksColor=None):
+#        super(LandmarksSizeandColorTab, self) .__init__(parent)
+#        
+#        if os.name is 'posix': #is a mac or linux
+#            scriptDir = os.path.dirname(sys.argv[0])
+#        else: #is a  windows 
+#            scriptDir = os.getcwd()
+#        
+#        #spacerh = QHLine()#QtWidgets.QWidget(self)
+#        #spacerh.setFixedSize(10,0)
+#        
+#        #spacerv = QtWidgets.QWidget(self)
+#        #spacerv.setFixedSize(0,10)
+#        
+#        self._LandmarksSize = LandmarksSize 
+#        self._LandmarksColor = LandmarksColor
+#        
+#        self._tab_name = 'Landmarks'
+#        
+#        
+#        #checkbox
+#        self._checkBox2 = QtWidgets.QCheckBox('iBUG Database', self)
+#        self._checkBox1 = QtWidgets.QCheckBox('MEEI Database', self)
+#        if self._ModelName == 'iBUG':
+#            self._checkBox1.setChecked(False)
+#            self._checkBox2.setChecked(True)
+#        else:
+#            self._checkBox1.setChecked(True) 
+#            self._checkBox2.setChecked(False)
+#        #self._checkBox3 = QtWidgets.QCheckBox('Subject and Camera Distance', self)
+#        
+#        
+#        self._CheckButtonGroup = QtWidgets.QButtonGroup(self)
+#        self._CheckButtonGroup.addButton(self._checkBox1,1)
+#        self._CheckButtonGroup.addButton(self._checkBox2,2)
+#        #self._CheckButtonGroup.addButton(self._checkBox3,3)
+#        
+#        self._help_checkBox1 = QtWidgets.QPushButton('', self)
+#        self._help_checkBox1.setIcon(QtGui.QIcon(scriptDir + os.path.sep + 'include' +os.path.sep +'icon_color'+ os.path.sep + 'question_icon.png'))
+#        self._help_checkBox1.clicked.connect(lambda: self.push_help_checkBox1())
+#        self._help_checkBox1.setIconSize(QtCore.QSize(20,20))
+#        
+#        
+#        self._help_checkBox2 = QtWidgets.QPushButton('', self)
+#        self._help_checkBox2.setIcon(QtGui.QIcon(scriptDir + os.path.sep + 'include' +os.path.sep +'icon_color'+ os.path.sep + 'question_icon.png'))
+#        self._help_checkBox2.clicked.connect(lambda: self.push_help_checkBox2())
+#        self._help_checkBox2.setIconSize(QtCore.QSize(20,20))
+#        
+#
+#        
+#        layout = QtWidgets.QGridLayout()
+#        
+#        layout.addWidget(self._checkBox1, 0,0)
+#        layout.addWidget(self._help_checkBox1, 0,1)
+#        layout.addWidget(QHLine(),1,0,1,2)
+#        layout.addWidget(self._checkBox2, 2,0,1,1)
+#        layout.addWidget(self._help_checkBox2, 2,1,1,1)
+#        
+#        self.setLayout(layout)
+#        
+#        
+#    def push_help_checkBox1(self):
+#        QtWidgets.QMessageBox.information(self, 'MEEI Database', 
+#                            'Database created using front face, standard clinical photographs from facial palsy patients', 
+#                            QtWidgets.QMessageBox.Ok)
+#              
+#    def push_help_checkBox2(self):
+#        QtWidgets.QMessageBox.information(self, 'iBUG Database', 
+#                            'Database created as part of the iBUG project, it contains thousands of images taken in the wild along with face portaits obtained from the web', 
+#                            QtWidgets.QMessageBox.Ok)   
 
 class ShowSettings(QtWidgets.QDialog):
     def __init__(self,parent=None, ModelName='iBUG', CalibrationType='Iris', CalibrationValue=11.77):
