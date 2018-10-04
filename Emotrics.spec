@@ -4,7 +4,7 @@ block_cipher = None
 
 
 a = Analysis(['Emotrics.py'],
-             pathex=['C:\\Users\\guarind\\Documents\\GitHub\\Emotrics'],
+             pathex=['C:\\Users\\GUARIND\\Documents\\GitHub\\Emotrics'],
              binaries=[],
              datas=[],
              hiddenimports=[],

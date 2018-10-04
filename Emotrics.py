@@ -114,12 +114,14 @@ class window(QtWidgets.QWidget):
     def __init__(self):
         super(window, self).__init__()
         #self.setGeometry(5,60,700,500)
-        self.setWindowTitle('Emotrics')
+        
+        self.setWindowTitle('Emotrics')    
         
         if os.name is 'posix': #is a mac or linux
             scriptDir = os.path.dirname(sys.argv[0])
         else: #is a  windows 
             scriptDir = os.getcwd()
+
 
         self.setWindowIcon(QtGui.QIcon(scriptDir + os.path.sep + 'include' +os.path.sep +'icon_color'+ os.path.sep + 'meei_3WR_icon.ico'))
         
@@ -303,6 +305,7 @@ class window(QtWidgets.QWidget):
             
             #reset the Imagedisplay object to show the image
             self.displayImage.update_view()
+            self.setWindowTitle('Emotrics - '+self._file_name.split(os.path.sep)[-1])
         
     def ChangePhoto(self):
         #function used to change the current photo of the patient
@@ -347,7 +350,7 @@ class window(QtWidgets.QWidget):
       
         #reset the Imagedisplay object to show the imagew
         self.displayImage.update_view()
-
+        self.setWindowTitle('Emotrics - '+self._file_name.split(os.path.sep)[-1])
         
     def create_new_window(self):
         #this creates a new window to display all the facial metrics, there 
@@ -644,6 +647,8 @@ class window(QtWidgets.QWidget):
                 self.displayImage._boundingbox = boundingbox
                 self.displayImage._points = None
                 self.displayImage.update_view()
+
+                self.setWindowTitle('Emotrics - '+self._file_name.split(os.path.sep)[-1])
             else:
                 #if the image is too large then it needs to be resized....
                 h,w,d = self.displayImage._opencvimage.shape
@@ -743,6 +748,8 @@ class window(QtWidgets.QWidget):
             
             #
             self.displayImage._points = None
+            
+            self.setWindowTitle('Emotrics - '+self._file_name.split(os.path.sep)[-1])
         elif numFaces == 0:
             #no face in image then shape is None
             self.displayImage._shape = None
