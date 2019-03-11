@@ -50,6 +50,7 @@ class ImageViewer(QtWidgets.QGraphicsView):
         self._boundingbox = None
         self._PointToModify = None
         self._points = None
+        self._landmark_size = None
         
         
         #this variable is used to verify is a landmark will be relocated
@@ -446,13 +447,15 @@ class ImageViewer(QtWidgets.QGraphicsView):
                     #in the iris using opencv 
                     if self._IsDragEyes:
                         if self._IsDragRight and not self._BothEyesTogether: #don't draw the right eye 
-                            temp_image = mark_picture(temp_image, self._shape, self._lefteye, [0,0,-1], self._points)
+                            temp_image = mark_picture(temp_image, self._shape, self._lefteye, [0,0,-1], self._points, self._landmark_size)
                         elif self._IsDragLeft and not self._BothEyesTogether: #don't draw the left eye 
-                            temp_image = mark_picture(temp_image, self._shape, [0,0,-1], self._righteye, self._points)                    
+                            temp_image = mark_picture(temp_image, self._shape, [0,0,-1], self._righteye, self._points, self._landmark_size)                    
                         elif self._BothEyesTogether: #don't draw both eyes 
-                            temp_image = mark_picture(temp_image, self._shape, [0,0,-1], [0,0,-1], self._points)        
+                            temp_image = mark_picture(temp_image, self._shape, [0,0,-1], [0,0,-1], self._points, self._landmark_size)        
                     else: #draw both eyes
-                        temp_image = mark_picture(temp_image, self._shape, self._lefteye, self._righteye, self._points)
+                        temp_image = mark_picture(temp_image, self._shape, self._lefteye, self._righteye, self._points, self._landmark_size)
+                        
+
                 
             image = cv2.cvtColor(temp_image,cv2.COLOR_BGR2RGB)
             height, width, channel = image.shape
@@ -489,7 +492,7 @@ class ImageViewer(QtWidgets.QGraphicsView):
         
             #draw 68 landmark points       
             if self._shape is not None:
-               temp_image = mark_picture(temp_image, self._shape, self._lefteye, self._righteye, self._points)
+               temp_image = mark_picture(temp_image, self._shape, self._lefteye, self._righteye, self._points, self._landmark_size)
     
             image = cv2.cvtColor(temp_image,cv2.COLOR_BGR2RGB)
             height, width, channel = image.shape

@@ -15,6 +15,7 @@ from PyQt5 import QtCore
 
 
 
+
 from results_window import ShowResults
 from results_window import CustomTabResult
 
@@ -32,11 +33,14 @@ from utilities import mark_picture
 from utilities import save_snaptshot_to_file
 from utilities import save_txt_file
 from utilities import save_xls_file_patient
+from utilities import get_landmark_size
 
 from ProcessLandmarks import GetLandmarks
 
 from save_window import SaveWindow
 from settings_window import ShowSettings
+
+
 
 
 
@@ -134,6 +138,8 @@ class window(QtWidgets.QWidget):
         self._toggle_landmaks = True
         self._toggle_lines = True
         
+        self._whichPhotofromPatient = None # variable used to figure out which photo from patient is being analyzed 
+        
         
         self._Scale = 1  #this variable carries the scale of the image if it 
                         #needs to be resized, if Scale = 1 then the origina 
@@ -146,10 +152,16 @@ class window(QtWidgets.QWidget):
         self.thread_landmarks = QtCore.QThread()  # no parent!
         
         
+        #these are additional steps that i had to take to be able to update the model on the fly...
+        self.threadFirstPhoto = QtCore.QThread()  # no parent!
+        self.threadSecondPhoto = QtCore.QThread()  # no parent!
+        
+        
         self._CalibrationType = 'Iris'  #_CalibrationType can be 'Iris' or 'Manual'
         self._CalibrationValue = 11.77 #calibration parameter
         
-        self._ModelName = 'iBUG' #_ModelType can be 'iBUGS' or 'MEE'
+        self._ModelName = 'MEE' #_ModelType can be 'iBUGS' or 'MEE'
+        
       
         #initialize the User Interface
         self.initUI()
@@ -302,6 +314,10 @@ class window(QtWidgets.QWidget):
             self.displayImage._righteye = self._Patient.FirstPhoto._righteye
             self.displayImage._shape = self._Patient.FirstPhoto._shape
             self.displayImage._points = self._Patient.FirstPhoto._points
+            self.displayImage._boundingbox = self._Patient.FirstPhoto._boundingbox
+            #change 3/7/2019
+            if self.displayImage._landmark_size is None:
+                self.displayImage._landmark_size = get_landmark_size(self.displayImage._shape)
             
             #reset the Imagedisplay object to show the image
             self.displayImage.update_view()
@@ -330,6 +346,10 @@ class window(QtWidgets.QWidget):
             self.displayImage._righteye = self._Patient.SecondPhoto._righteye
             self.displayImage._shape = self._Patient.SecondPhoto._shape
             self.displayImage._points = self._Patient.SecondPhoto._points
+            self.displayImage._boundingbox = self._Patient.SecondPhoto._boundingbox
+            #change 3/7/2019
+            if self.displayImage._landmark_size is None:
+                self.displayImage._landmark_size = get_landmark_size(self.displayImage._shape)
             
         elif self._file_name == self._Patient.SecondPhoto._file_name:
             #the second photo is on memory and we wnat to move to the first photo
@@ -347,6 +367,10 @@ class window(QtWidgets.QWidget):
             self.displayImage._righteye = self._Patient.FirstPhoto._righteye
             self.displayImage._shape = self._Patient.FirstPhoto._shape
             self.displayImage._points = self._Patient.FirstPhoto._points
+            self.displayImage._boundingbox = self._Patient.FirstPhoto._boundingbox
+            #change 3/7/2019
+            if self.displayImage._landmark_size is None:
+                self.displayImage._landmark_size = get_landmark_size(self.displayImage._shape)
       
         #reset the Imagedisplay object to show the imagew
         self.displayImage.update_view()
@@ -646,33 +670,41 @@ class window(QtWidgets.QWidget):
                 self.displayImage._shape = shape
                 self.displayImage._boundingbox = boundingbox
                 self.displayImage._points = None
+                #change 3/7/2019
+                self.displayImage._landmark_size = get_landmark_size(self.displayImage._shape)
+                
                 self.displayImage.update_view()
 
                 self.setWindowTitle('Emotrics - '+self._file_name.split(os.path.sep)[-1])
             else:
-                #if the image is too large then it needs to be resized....
-                h,w,d = self.displayImage._opencvimage.shape
+               self.getShapefromImage()
+                
+    
+    def getShapefromImage(self, update=False):
+        
+        #if the image is too large then it needs to be resized....
+        h,w,d = self.displayImage._opencvimage.shape
 
-                #if the image is too big then we need to resize it so that the landmark 
-                #localization process can be performed in a reasonable time 
-                self._Scale = 1  #start from a clear initial scale
-                if h > 1500 or w > 1500 :
-                    if h >= w :
-                        h_n = 1500
-                        self._Scale = h/h_n
-                        w_n = int(np.round(w/self._Scale,0))
-                        #self.displayImage._opencvimage=cv2.resize(self.displayImage._opencvimage, (w_n, h_n), interpolation=cv2.INTER_AREA)
-                        temp_image = cv2.resize(self.displayImage._opencvimage, (w_n, h_n), interpolation=cv2.INTER_AREA)
-                        #self._image = image
-                    else :
-                        w_n = 1500
-                        self._Scale = w/w_n
-                        h_n = int(np.round(h/self._Scale,0))
-                        #self.displayImage._opencvimage=cv2.resize(self.displayImage._opencvimage, (w_n, h_n), interpolation=cv2.INTER_AREA)
-                        temp_image = cv2.resize(self.displayImage._opencvimage, (w_n, h_n), interpolation=cv2.INTER_AREA)
-                        #self._image = image     
-                 
-                    
+        #if the image is too big then we need to resize it so that the landmark 
+        #localization process can be performed in a reasonable time 
+        self._Scale = 1  #start from a clear initial scale
+        if h > 1500 or w > 1500 :
+            if h >= w :
+                h_n = 1500
+                self._Scale = h/h_n
+                w_n = int(np.round(w/self._Scale,0))
+                #self.displayImage._opencvimage=cv2.resize(self.displayImage._opencvimage, (w_n, h_n), interpolation=cv2.INTER_AREA)
+                temp_image = cv2.resize(self.displayImage._opencvimage, (w_n, h_n), interpolation=cv2.INTER_AREA)
+                #self._image = image
+            else :
+                w_n = 1500
+                self._Scale = w/w_n
+                h_n = int(np.round(h/self._Scale,0))
+                #self.displayImage._opencvimage=cv2.resize(self.displayImage._opencvimage, (w_n, h_n), interpolation=cv2.INTER_AREA)
+                temp_image = cv2.resize(self.displayImage._opencvimage, (w_n, h_n), interpolation=cv2.INTER_AREA)
+                #self._image = image     
+         
+            
 #                    #now that the image has been reduced, ask the user if the image 
 #                    #should be saved for continue the processing, otherwise the 
 #                    #processing cannot continue with the large image
@@ -698,30 +730,35 @@ class window(QtWidgets.QWidget):
 #                        name = name[:-4]+'_small.png'
 #                        self._file_name = name
 #                        cv2.imwrite(name,self.displayImage._opencvimage)
-                else:
-                    #the image is of appropiate dimensions so no need for modification
-                    temp_image = self.displayImage._opencvimage.copy()
-                    #pass
-                
-                #get the landmarks using dlib, and the and the iris 
-                #using Dougman's algorithm  
-                #This is done in a separate thread to prevent the gui from 
-                #freezing and crashing
-                
+        else:
+            #the image is of appropiate dimensions so no need for modification
+            temp_image = self.displayImage._opencvimage.copy()
+            #pass
+        
+        #get the landmarks using dlib, and the and the iris 
+        #using Dougman's algorithm  
+        #This is done in a separate thread to prevent the gui from 
+        #freezing and crashing
+        
 
-                #create worker, pass the image to the worker
-                #self.landmarks = GetLandmarks(self.displayImage._opencvimage)
-                self.landmarks = GetLandmarks(temp_image, self._ModelName)
-                #move worker to new thread
-                self.landmarks.moveToThread(self.thread_landmarks)
-                #start the new thread where the landmark processing will be performed
-                self.thread_landmarks.start() 
-                #Connect Thread started signal to Worker operational slot method
-                self.thread_landmarks.started.connect(self.landmarks.getlandmarks)
-                #connect signal emmited by landmarks to a function
-                self.landmarks.landmarks.connect(self.ProcessShape)
-                #define the end of the thread
-                self.landmarks.finished.connect(self.thread_landmarks.quit) 
+        #create worker, pass the image to the worker
+        #self.landmarks = GetLandmarks(self.displayImage._opencvimage)
+        self.landmarks = GetLandmarks(temp_image, self._ModelName)
+        #move worker to new thread
+        self.landmarks.moveToThread(self.thread_landmarks)
+        #start the new thread where the landmark processing will be performed
+        self.thread_landmarks.start() 
+        #Connect Thread started signal to Worker operational slot method
+        self.thread_landmarks.started.connect(self.landmarks.getlandmarks)
+        
+        #connect signal emmited by landmarks to a function
+        if update: #this is a model update, treat it like that    
+            self.landmarks.landmarks.connect(self.ProcessShape_update)            
+        else: #this is a new image, treat it like that  
+            self.landmarks.landmarks.connect(self.ProcessShape)
+                        
+        #define the end of the thread
+        self.landmarks.finished.connect(self.thread_landmarks.quit)
 
             
     def ProcessShape(self, shape, numFaces, lefteye, righteye, boundingbox):
@@ -741,14 +778,21 @@ class window(QtWidgets.QWidget):
                 for k in range(0,4):
                     boundingbox[k] = int(np.round(boundingbox[k]*self._Scale,0))
             
+            
+            #update shape and bounding box always 
             self.displayImage._shape = shape
+            self.displayImage._boundingbox = boundingbox
             self.displayImage._lefteye = lefteye
             self.displayImage._righteye = righteye
-            self.displayImage._boundingbox = boundingbox
+                
+            #compute landmark size only if not avaliable
+            #change 3/7/2019
+            if self.displayImage._landmark_size is None:
+                self.displayImage._landmark_size = get_landmark_size(self.displayImage._shape)
             
             #
             self.displayImage._points = None
-            
+        
             self.setWindowTitle('Emotrics - '+self._file_name.split(os.path.sep)[-1])
         elif numFaces == 0:
             #no face in image then shape is None
@@ -766,6 +810,33 @@ class window(QtWidgets.QWidget):
                         QtWidgets.QMessageBox.Ok, QtWidgets.QMessageBox.NoButton)
           
         self.displayImage.update_view()
+        
+        
+    #changed this on 3/9/19
+    def ProcessShape_update(self, shape, numFaces, lefteye, righteye, boundingbox):
+        #we know that there is a face, so we don't need to check if there are multiple faces 
+           
+        if self._Scale is not 1: #in case that a smaller image was used for 
+                                 #processing, then update the landmark 
+                                 #position with the scale factor
+            for k in range(0,68):
+                shape[k] = [int(np.round(shape[k,0]*self._Scale,0)) ,
+                            int(np.round(shape[k,1]*self._Scale,0))]
+                
+            for k in range(0,3):
+                lefteye[k] = int(np.round(lefteye[k]*self._Scale,0))
+                righteye[k] = int(np.round(righteye[k]*self._Scale,0))
+                
+            for k in range(0,4):
+                boundingbox[k] = int(np.round(boundingbox[k]*self._Scale,0))
+                
+                
+        #just update the landmarks and bouding box
+        self.displayImage._shape = shape
+        self.displayImage._boundingbox = boundingbox
+        self.displayImage.set_update_photo() 
+
+           
     
     def load_iris(self):
         #load a file using the widget
@@ -834,7 +905,7 @@ class window(QtWidgets.QWidget):
     
                 #draw 68 landmark points       
                 if self.displayImage._shape is not None:
-                   temp_image = mark_picture(temp_image, self.displayImage._shape, self.displayImage._lefteye, self.displayImage._righteye, self.displayImage._points)
+                   temp_image = mark_picture(temp_image, self.displayImage._shape, self.displayImage._lefteye, self.displayImage._righteye, self.displayImage._points, self.displayImage._landmark_size)
                    
                 save_snaptshot_to_file(temp_image,name)
 
@@ -885,21 +956,215 @@ class window(QtWidgets.QWidget):
             #1) modify the calibration parameter used to compute all the real-life measurements 
             #2) Select the model used for landmakr estimation
         #we send the current values to the window so that the values can be preserved when a new photo is loaded
-        Settings = ShowSettings(self, self._ModelName, self._CalibrationType, self._CalibrationValue)
+        Settings = ShowSettings(self, self._ModelName, self._CalibrationType, self._CalibrationValue, size_landmarks = self.displayImage._landmark_size, shape = self.displayImage._shape)
         Settings.exec_()
         
-        #get values from the window and update appropiate parameters 
-        if Settings.tab1._checkBox1.isChecked() == True:
-            self._CalibrationType = 'Iris'
-            self._CalibrationValue = float(Settings.tab1._IrisDiameter_Edit.text())
-        elif Settings.tab1._checkBox2.isChecked() == True:
-            self._CalibrationType = 'Manual'
-            self._CalibrationValue = float(Settings.tab1._Personalized_Edit.text())
+        if Settings.isCanceled:  #the person just clickes cancel, don't do anything
+            pass
+        else:        
+            #get values from the window and update appropiate parameters 
+            if Settings.tab1._checkBox1.isChecked() == True:
+                self._CalibrationType = 'Iris'
+                self._CalibrationValue = float(Settings.tab1._IrisDiameter_Edit.text())
+            elif Settings.tab1._checkBox2.isChecked() == True:
+                self._CalibrationType = 'Manual'
+                self._CalibrationValue = float(Settings.tab1._Personalized_Edit.text())
+             
+                
+            #these options requiere a possible re-calculation of landmarks and re-draw 
             
-        if Settings.tab2._checkBox2.isChecked() == True:
-            self._ModelName = 'iBUG'
-        elif Settings.tab2._checkBox1.isChecked() == True:
-            self._ModelName = 'MEE'
+            #check if the user decided to change the model
+            old_modelName = self._ModelName
+            is_model_changed = False
+            if Settings.tab2._checkBox2.isChecked() == True:
+                self._ModelName = 'iBUG'
+            elif Settings.tab2._checkBox1.isChecked() == True:
+                self._ModelName = 'MEE'
+            elif Settings.tab2._checkBox2.isChecked() == False and Settings.tab2._checkBox1.isChecked() == False:
+                self._ModelName = Settings.tab2._ModelName
+                
+            if old_modelName == self._ModelName  :
+                pass
+            else:
+                is_model_changed = True
+                
+            #print(self._ModelName)
+                
+               
+            #check if the user decided to change the landmark size
+            user_size_landmark = Settings.tab3._Landmark_Size_Edit.text()
+            old_size_landmark = self.displayImage._landmark_size
+            is_landmark_changed = False
+            if user_size_landmark is "":
+                size_landmarks = old_size_landmark
+            elif int(user_size_landmark) ==  0: #used entered zero, just ignore it 
+                size_landmarks = old_size_landmark
+            else:
+                size_landmarks = int(user_size_landmark)
+                
+            if size_landmarks == old_size_landmark:
+                pass
+            else:
+                is_landmark_changed = True
+                #update landmark size information 
+                self.displayImage._landmark_size = size_landmarks
+            
+    
+            
+            #if model is the same and landmark changed the just re-draw landmarks
+            if is_landmark_changed == True and is_model_changed == False:            
+                self.displayImage.set_update_photo()
+                
+            #if the model changed, re-compute landmark localization and re-draw 
+            if is_model_changed == True:
+                
+                #used changed the model, so we need to re-calculate the landmarks for the photos
+                if self._Patient is None: #there is only one image so just recalculate everything for that image. 
+                    self.getShapefromImage(update=True)
+                else: #there is a patient in memory (two images), so we need to work on both images.
+                    
+                    #this can be improve to remove some unnecesary steps... If someone reads this, please work on it.
+                    
+                    #Here is the plan: we will take each image and will create a new qthread to process each image at the time 
+                    #will then pass the info into a new function that will take care of updating that particular image
+                    #finally, will update the current view
+                    
+                    self.UpdateFirstPhoto_Patient()
+                    
+
+                    
+    def UpdateFirstPhoto_Patient(self):
+        
+        h,w,d = self._Patient.FirstPhoto._photo.shape
+
+        #if the image is too big then we need to resize it so that the landmark 
+        #localization process can be performed in a reasonable time 
+        self._Scale = 1  #start from a clear initial scale
+        if h > 1500 or w > 1500 :
+            if h >= w :
+                h_n = 1500
+                self._Scale = h/h_n
+                w_n = int(np.round(w/self._Scale,0))
+                temp_image = cv2.resize(self._Patient.FirstPhoto._photo, (w_n, h_n), interpolation=cv2.INTER_AREA)
+            else :
+                w_n = 1500
+                self._Scale = w/w_n
+                h_n = int(np.round(h/self._Scale,0))
+                temp_image = cv2.resize(self._Patient.FirstPhoto._photo, (w_n, h_n), interpolation=cv2.INTER_AREA)
+         
+        else:
+            temp_image = self._Patient.FirstPhoto._photo.copy()
+            
+        
+        self.landmarksFirstPhoto = GetLandmarks(temp_image, self._ModelName)
+        self.landmarksFirstPhoto.moveToThread(self.threadFirstPhoto)
+        self.threadFirstPhoto.start()
+        self.threadFirstPhoto.started.connect(self.landmarksFirstPhoto.getlandmarks)
+        self.landmarksFirstPhoto.landmarks.connect(self.ProcessShape_UpdateFirstPhoto)
+        
+        self.landmarksFirstPhoto.finished.connect(self.threadFirstPhoto.quit)
+        
+    def ProcessShape_UpdateFirstPhoto(self, shape, numFaces, lefteye, righteye, boundingbox):
+        #this function takes care of updating the FirstPhoto from patient
+        
+        #we know that there is a face, so we don't need to check if there are multiple faces 
+           
+        if self._Scale is not 1: #in case that a smaller image was used for 
+                                 #processing, then update the landmark 
+                                 #position with the scale factor
+            for k in range(0,68):
+                shape[k] = [int(np.round(shape[k,0]*self._Scale,0)) ,
+                            int(np.round(shape[k,1]*self._Scale,0))]
+                
+            for k in range(0,3):
+                lefteye[k] = int(np.round(lefteye[k]*self._Scale,0))
+                righteye[k] = int(np.round(righteye[k]*self._Scale,0))
+                
+            for k in range(0,4):
+                boundingbox[k] = int(np.round(boundingbox[k]*self._Scale,0))
+                
+                
+        #just update the landmarks and bouding box
+        self._Patient.FirstPhoto._shape = shape
+        self._Patient.FirstPhoto._boundingbox = boundingbox
+        
+        
+        #verify if the FirstPhoto is currently on screen 
+        if self._file_name == self._Patient.FirstPhoto._file_name:
+            #the update the view
+            self.displayImage._shape = shape
+            self.displayImage._boundingbox = boundingbox
+            self.displayImage.set_update_photo() 
+            
+            
+        #first photo done, now do secondphoto
+        self.UpdateSecondPhoto_Patient()
+        
+    def UpdateSecondPhoto_Patient(self):
+        
+        h,w,d = self._Patient.SecondPhoto._photo.shape
+
+        #if the image is too big then we need to resize it so that the landmark 
+        #localization process can be performed in a reasonable time 
+        self._Scale = 1  #start from a clear initial scale
+        if h > 1500 or w > 1500 :
+            if h >= w :
+                h_n = 1500
+                self._Scale = h/h_n
+                w_n = int(np.round(w/self._Scale,0))
+                temp_image = cv2.resize(self._Patient.SecondPhoto._photo, (w_n, h_n), interpolation=cv2.INTER_AREA)
+            else :
+                w_n = 1500
+                self._Scale = w/w_n
+                h_n = int(np.round(h/self._Scale,0))
+                temp_image = cv2.resize(self._Patient.SecondPhoto._photo, (w_n, h_n), interpolation=cv2.INTER_AREA)
+         
+        else:
+            temp_image = self._Patient.SecondPhoto._photo.copy()
+            
+        
+        self.landmarksSecondPhoto = GetLandmarks(temp_image, self._ModelName)
+        
+        self.landmarksSecondPhoto.moveToThread(self.threadSecondPhoto)
+        self.threadSecondPhoto.start()
+        self.threadSecondPhoto.started.connect(self.landmarksSecondPhoto.getlandmarks)
+        self.landmarksSecondPhoto.landmarks.connect(self.ProcessShape_UpdateSecondPhoto)
+        
+        self.landmarksSecondPhoto.finished.connect(self.threadSecondPhoto.quit)
+        
+    def ProcessShape_UpdateSecondPhoto(self, shape, numFaces, lefteye, righteye, boundingbox):
+        #this function takes care of updating the SecondPhoto from patient
+        
+        #we know that there is a face, so we don't need to check if there are multiple faces 
+           
+        if self._Scale is not 1: #in case that a smaller image was used for 
+                                 #processing, then update the landmark 
+                                 #position with the scale factor
+            for k in range(0,68):
+                shape[k] = [int(np.round(shape[k,0]*self._Scale,0)) ,
+                            int(np.round(shape[k,1]*self._Scale,0))]
+                
+            for k in range(0,3):
+                lefteye[k] = int(np.round(lefteye[k]*self._Scale,0))
+                righteye[k] = int(np.round(righteye[k]*self._Scale,0))
+                
+            for k in range(0,4):
+                boundingbox[k] = int(np.round(boundingbox[k]*self._Scale,0))
+                
+                
+        #just update the landmarks and bouding box
+
+        self._Patient.SecondPhoto._shape = shape
+        self._Patient.SecondPhoto._boundingbox = boundingbox
+        
+        
+        #verify if the FirstPhoto is currently on screen 
+        if self._file_name == self._Patient.SecondPhoto._file_name:
+            #the update the view
+            self.displayImage._shape = shape
+            self.displayImage._boundingbox = boundingbox
+            self.displayImage.set_update_photo()             
+           
             
     def about_app(self):
         
@@ -937,6 +1202,7 @@ if __name__ == '__main__':
     app.setStyle(QtWidgets.QStyleFactory.create('Cleanlooks'))
         
     GUI = window()
+    
     #GUI.show()
     app.exec_()
     

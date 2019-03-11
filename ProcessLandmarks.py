@@ -43,8 +43,11 @@ class GetLandmarks(QObject):
             scriptDir = os.getcwd()
         if self._ModelName == 'iBUG':  #user wants to use iBUGS model
             predictor = shape_predictor(scriptDir + os.path.sep + 'include' +os.path.sep +'data'+ os.path.sep + 'shape_predictor_68_face_landmarks.dat')
-        else: #user wants to use MEE model
+        elif self._ModelName == 'MEE':  #user wants to use MEE model
             predictor = shape_predictor(scriptDir + os.path.sep + 'include' +os.path.sep +'data'+ os.path.sep + 'mee_shape_predictor_68_face_landmarks.dat')
+        else: #user wants to use own model        
+            predictor = shape_predictor(os.path.normpath(self._ModelName))
+            
 
         #make a local copy of the image
         image = self._image.copy()
@@ -100,7 +103,6 @@ class GetLandmarks(QObject):
             #the function get_iris will update the variables _lefteye and _righteye
             self.get_iris()
             
-                
             #it finished processing the face, now emit the results
             self.landmarks.emit(self._shape, len(rects), self._lefteye, self._righteye, self._boundingbox)
             

@@ -135,7 +135,18 @@ def get_info_from_txt(file):
            
     return shape, lefteye, righteye, boundingbox
 
-def mark_picture(image, shape, circle_left, circle_right, points = None):
+def get_landmark_size(shape):
+    if shape[36,1]!=-1 and shape[39,1]!=-1:
+        size_landmarks = np.round(0.025*np.sqrt((shape[39,0]-shape[36,0])**2 + (shape[39,1]-shape[36,1])**2),0)
+        size_landmarks = int(np.floor(size_landmarks))
+    else:
+        size_landmarks = np.round(0.025*np.sqrt((shape[42,0]-shape[45,0])**2 + (shape[42,1]-shape[45,1])**2),0)
+        size_landmarks = int(np.floor(size_landmarks))  
+        
+    return size_landmarks
+    
+
+def mark_picture(image, shape, circle_left, circle_right, points = None, size_landmarks = None):
     #function to draw on the image the landmaks, iris circles and lines
     
     h,w,_=image.shape
@@ -154,17 +165,20 @@ def mark_picture(image, shape, circle_left, circle_right, points = None):
 
     #draw 68 landmark points
     aux=1
-    if shape[36,1]!=-1 and shape[39,1]!=-1:
-        size_landmarks = np.round(0.025*np.sqrt((shape[39,0]-shape[36,0])**2 + (shape[39,1]-shape[36,1])**2),0)
-        size_landmarks = int(np.floor(size_landmarks))
-    else:
-        size_landmarks = np.round(0.025*np.sqrt((shape[42,0]-shape[45,0])**2 + (shape[42,1]-shape[45,1])**2),0)
-        size_landmarks = int(np.floor(size_landmarks))  
+    if size_landmarks is None:
+        if shape[36,1]!=-1 and shape[39,1]!=-1:
+            size_landmarks = np.round(0.025*np.sqrt((shape[39,0]-shape[36,0])**2 + (shape[39,1]-shape[36,1])**2),0)
+            size_landmarks = int(np.floor(size_landmarks))
+        else:
+            size_landmarks = np.round(0.025*np.sqrt((shape[42,0]-shape[45,0])**2 + (shape[42,1]-shape[45,1])**2),0)
+            size_landmarks = int(np.floor(size_landmarks)) 
+
 
     for (x,y) in shape:
         if x>0:
             #mark_size=int(w/180)
             #if mark_size>4: mark_size=4
+            #size_landmarks = 4
             if aux == 62 or aux == 64 or aux == 38 or aux == 39 or aux == 44 or aux == 45:
                 cv2.circle(image, (x,y), size_landmarks , (0,255,255),-1)
             elif aux == 63 :

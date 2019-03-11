@@ -9,6 +9,7 @@ import os
 import cv2
 import numpy as np
 import time
+import sys
 from PyQt5 import QtWidgets
 from PyQt5 import QtGui
 from PyQt5 import QtCore
