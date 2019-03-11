@@ -321,7 +321,7 @@ class window(QtWidgets.QWidget):
             
             #reset the Imagedisplay object to show the image
             self.displayImage.update_view()
-            self.setWindowTitle('Emotrics - '+self._file_name.split(os.path.sep)[-1])
+            self.setWindowTitle('Emotrics - '+self._Patient.patient_ID+' -- '+self._file_name.split(os.path.sep)[-1])
         
     def ChangePhoto(self):
         #function used to change the current photo of the patient
@@ -374,7 +374,8 @@ class window(QtWidgets.QWidget):
       
         #reset the Imagedisplay object to show the imagew
         self.displayImage.update_view()
-        self.setWindowTitle('Emotrics - '+self._file_name.split(os.path.sep)[-1])
+        self.setWindowTitle('Emotrics - '+self._Patient.patient_ID+' -- '+self._file_name.split(os.path.sep)[-1])
+        
         
     def create_new_window(self):
         #this creates a new window to display all the facial metrics, there 

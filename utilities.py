@@ -523,16 +523,16 @@ def save_txt_file(file_name,shape,circle_left,circle_right, boundingbox):
     #to create the final file, these files are then eliminated. This is
     #simplest (and easiest) way that i found to do this
     np.savetxt(file_no_ext +'_temp_shape.txt', shape, delimiter=',',
-                   fmt='%i', newline='\r\n')
+                   fmt='%i', newline='\r')
     
     np.savetxt(file_no_ext + '_temp_circle_left.txt', circle_left, delimiter=',',
-                   fmt='%i', newline='\r\n')
+                   fmt='%i', newline='\r')
     
     np.savetxt(file_no_ext + '_temp_circle_right.txt', circle_right, delimiter=',',
-                   fmt='%i', newline='\r\n')
+                   fmt='%i', newline='\r')
     
     np.savetxt(file_no_ext + '_temp_boundingbox.txt', boundingbox, delimiter=',',
-                   fmt='%i', newline='\r\n')
+                   fmt='%i', newline='\r')
         
     #create a new file that will contain the information, the file will have 
     #the same name as the original picture 
@@ -641,6 +641,7 @@ def save_xls_file_patient(path,Patient,CalibrationType,CalibrationValue):
     #first photo
     MeasurementsLeftFirst, MeasurementsRightFirst, MeasurementsDeviation, MeasurementsPercentual = get_measurements_from_data(Patient.FirstPhoto._shape,Patient.FirstPhoto._lefteye,Patient.FirstPhoto._righteye,CalibrationType,CalibrationValue)
     
+
     BH = np.array([[MeasurementsRightFirst.BrowHeight,MeasurementsLeftFirst.BrowHeight,MeasurementsDeviation.BrowHeight,MeasurementsPercentual.BrowHeight]],dtype=object)
     MRD1 = np.array([[MeasurementsRightFirst.MarginalReflexDistance1, MeasurementsLeftFirst.MarginalReflexDistance1,MeasurementsDeviation.MarginalReflexDistance1,MeasurementsPercentual.MarginalReflexDistance1]], dtype=object)
     MRD2 = np.array([[MeasurementsRightFirst.MarginalReflexDistance2, MeasurementsLeftFirst.MarginalReflexDistance2,MeasurementsDeviation.MarginalReflexDistance2,MeasurementsPercentual.MarginalReflexDistance2]],dtype=object)
@@ -655,10 +656,10 @@ def save_xls_file_patient(path,Patient,CalibrationType,CalibrationValue):
     for i in elements:
         if i is not 'BH':
             fillFirst = np.append(fillFirst, eval(i), axis = 1)
-            
+      
     #Second photo
     MeasurementsLeftSecond, MeasurementsRightSecond, MeasurementsDeviation, MeasurementsPercentual = get_measurements_from_data(Patient.SecondPhoto._shape,Patient.SecondPhoto._lefteye,Patient.SecondPhoto._righteye,CalibrationType,CalibrationValue)
-    
+
     BH = np.array([[MeasurementsRightSecond.BrowHeight,MeasurementsLeftSecond.BrowHeight,MeasurementsDeviation.BrowHeight,MeasurementsPercentual.BrowHeight]],dtype=object)
     MRD1 = np.array([[MeasurementsRightSecond.MarginalReflexDistance1, MeasurementsLeftSecond.MarginalReflexDistance1,MeasurementsDeviation.MarginalReflexDistance1,MeasurementsPercentual.MarginalReflexDistance1]], dtype=object)
     MRD2 = np.array([[MeasurementsRightSecond.MarginalReflexDistance2, MeasurementsLeftSecond.MarginalReflexDistance2,MeasurementsDeviation.MarginalReflexDistance2,MeasurementsPercentual.MarginalReflexDistance2]],dtype=object)
@@ -673,7 +674,7 @@ def save_xls_file_patient(path,Patient,CalibrationType,CalibrationValue):
     for i in elements:
         if i is not 'BH':
             fillSecond = np.append(fillSecond, eval(i), axis = 1)
-            
+    
     #difference       
     BH = np.array([[MeasurementsRightFirst.BrowHeight-MeasurementsRightSecond.BrowHeight,MeasurementsLeftFirst.BrowHeight-MeasurementsLeftSecond.BrowHeight,'','']],dtype=object)
     MRD1 = np.array([[MeasurementsRightFirst.MarginalReflexDistance1-MeasurementsRightSecond.MarginalReflexDistance1, MeasurementsLeftFirst.MarginalReflexDistance1-MeasurementsLeftSecond.MarginalReflexDistance1,'','']], dtype=object)
@@ -691,13 +692,13 @@ def save_xls_file_patient(path,Patient,CalibrationType,CalibrationValue):
             fillDifference = np.append(fillDifference, eval(i), axis = 1)
     
   
-    
+
     Index = [Patient.FirstPhoto._ID, Patient.SecondPhoto._ID, 'Difference']
 
     df = pd.DataFrame(np.vstack((fillFirst, fillSecond, fillDifference)), index = Index, columns = Columns)
     df.columns = pd.MultiIndex.from_tuples(list(zip(Header,df.columns)))
     
-    
+
     
     delimiter = os.path.sep
     temp=path.split(delimiter)
@@ -705,5 +706,5 @@ def save_xls_file_patient(path,Patient,CalibrationType,CalibrationValue):
     path=delimiter.join(path)
 
     file_name = path + delimiter + Patient.patient_ID +'.xlsx'
-    #print(file_name)
+   
     df.to_excel(file_name,index = True)
