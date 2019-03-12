@@ -29,16 +29,11 @@ https://myfiles.meei.harvard.edu/users/hilll/Jowett-Nate/Emotrics.zip?ticket=t_f
 
 (this application won't work on windows 32-bit, there is not plan to generate a workable 32-bit app, if you are running a 32-bit machine you would need to use Emotrics via source code). 
 
-Mac version of Emotrics can be obtained here: 
-https://myfiles.meei.harvard.edu/users/hilll/Jowett-Nate/Emotrics_for_MAC.zip?ticket=t_fkYWvlVo
-
-(this application was tested on macOS Sierra, if it doesn't work in your MAC computer, you would need to use Emotrics via source code).
+Currently there is no updated version of Emotrics for Mac or Linux. 
 
 Instructions (for Windows):
 Download the .zip file and unzip it. This will create a folder called Emotrics, localize the executable file Emotrics.exe. Double click on it and the app should start. Depending on your computer this can take up to a minute.  
 
-Instruction (for Mac):
-Download the .zip file and unzip it. This will create a compressed folder called Emotrics_for_MAC.app. Double click on it and the app should start. Depending on your computer this can take up to a minute.
 
 
 
