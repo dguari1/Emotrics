@@ -1019,19 +1019,20 @@ class window(QtWidgets.QWidget):
             #if the model changed, re-compute landmark localization and re-draw 
             if is_model_changed == True:
                 
-                #used changed the model, so we need to re-calculate the landmarks for the photos
-                if self._Patient is None: #there is only one image so just recalculate everything for that image. 
-                    self.getShapefromImage(update=True)
-                else: #there is a patient in memory (two images), so we need to work on both images.
-                    
-                    #this can be improve to remove some unnecesary steps... If someone reads this, please work on it.
-                    
-                    #Here is the plan: we will take each image and will create a new qthread to process each image at the time 
-                    #will then pass the info into a new function that will take care of updating that particular image
-                    #finally, will update the current view
-                    
-                    self.UpdateFirstPhoto_Patient()
-                    
+                if self.displayImage._shape is not None: #there is an image already there
+                    #used changed the model, so we need to re-calculate the landmarks for the photos
+                    if self._Patient is None: #there is only one image so just recalculate everything for that image. 
+                        self.getShapefromImage(update=True)
+                    else: #there is a patient in memory (two images), so we need to work on both images.
+                        
+                        #this can be improve to remove some unnecesary steps... If someone reads this, please work on it.
+                        
+                        #Here is the plan: we will take each image and will create a new qthread to process each image at the time 
+                        #will then pass the info into a new function that will take care of updating that particular image
+                        #finally, will update the current view
+                        
+                        self.UpdateFirstPhoto_Patient()
+                        
 
                     
     def UpdateFirstPhoto_Patient(self):

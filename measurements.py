@@ -308,6 +308,8 @@ def get_measurements_from_data(shape, left_pupil, right_pupil, CalibrationType, 
     y1_lowerlip=np.append(y1_lowerlip,temp[::-1])
     #find where the lip curve crosses with the rotated 'x' axis, this provides the 
     #point where the lips cross with the middle of the face 
+    print(rot_angle, center)
+    print(x1_lowerlip)
     cross_lowerlip=rotate_axis(np.column_stack((x1_lowerlip,y1_lowerlip)),rot_angle,center)
     
     comm_exc_left, smile_angle_left, _ = mouth_measures(cross_lowerlip, shape[54], rot_angle)
