@@ -46,7 +46,7 @@ Finally, clone this repository and execute Emotrics.py, this will open the Emotr
 Alternatively, you can download an .exe file and run Emotrics without any additional installation. 
 
 A Windows 64-bit version of Emotrics can be obtained here:
-https://myfiles.meei.harvard.edu/users/hilll/Jowett-Nate/Emotrics.zip?ticket=t_fkYWvlVo
+https://www.dropbox.com/s/d9xy43tmosfh69z/Emotrics.zip?dl=0
 
 (this application won't work on windows 32-bit, there is not plan to generate a workable 32-bit app, if you are running a 32-bit machine you should use Emotrics via source code). 
 
