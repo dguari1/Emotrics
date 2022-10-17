@@ -800,7 +800,7 @@ class window(QtWidgets.QWidget):
             self.displayImage._shape = None
             #inform the user
             QtWidgets.QMessageBox.warning(self,"Warning",
-                    "No face in the image.\nIf the image does contain a face plase modify the brightness and try again.",
+                    "No face in the image.\nIf the image does contain a face please modify the brightness and try again.",
                         QtWidgets.QMessageBox.Ok, QtWidgets.QMessageBox.NoButton)
         elif numFaces > 1:
             #multiple faces in image then shape is None
