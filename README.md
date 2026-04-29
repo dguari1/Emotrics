@@ -4,7 +4,7 @@ Software to autmatically compute facial metrics in unilateral facial paralysis
 Emotrics is a python (PyQt5) based application developed to facilitate the estimation of facial measurements in photographs. 
 
 Emotrics works by automatically placing a set of 68 facial landmarks in photographs, the position of the landmarks can be easily adjusted to improve accuracy. Emotrics uses the landmarks to estimate a set of facial metrics that might be used for assessment of facial symmetry and function. 
-Moreover, Emotrics can be compare metrics from two photographs of the same subject taken at different time points. 
+Moreover, Emotrics can compare metrics from two photographs of the same subject taken at different time points. 
 
 If you use this code, please cite:
 - Guarin, D. L., Dusseldorp, J., Hadlock, T. A., & Jowett, N. (2018). A machine learning approach for automated facial measurements in facial palsy. JAMA facial plastic surgery, 20(4), 335-337.
